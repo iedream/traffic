@@ -16,6 +16,8 @@
 		4FDB6C131D78EAF200B668EE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4FDB6C111D78EAF200B668EE /* LaunchScreen.storyboard */; };
 		4FDB6C1E1D78EAF200B668EE /* traffic2Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C1D1D78EAF200B668EE /* traffic2Tests.m */; };
 		4FDB6C291D78EAF200B668EE /* traffic2UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C281D78EAF200B668EE /* traffic2UITests.m */; };
+		4FDB6C371D78EBBD00B668EE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FDB6C361D78EBBD00B668EE /* MapKit.framework */; };
+		4FDB6C391D78F3C200B668EE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FDB6C381D78F3C200B668EE /* CoreLocation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,8 @@
 		4FDB6C241D78EAF200B668EE /* traffic2UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = traffic2UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FDB6C281D78EAF200B668EE /* traffic2UITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = traffic2UITests.m; sourceTree = "<group>"; };
 		4FDB6C2A1D78EAF200B668EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4FDB6C361D78EBBD00B668EE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		4FDB6C381D78F3C200B668EE /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +65,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FDB6C391D78F3C200B668EE /* CoreLocation.framework in Frameworks */,
+				4FDB6C371D78EBBD00B668EE /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +90,8 @@
 		4FDB6BF41D78EAF200B668EE = {
 			isa = PBXGroup;
 			children = (
+				4FDB6C381D78F3C200B668EE /* CoreLocation.framework */,
+				4FDB6C361D78EBBD00B668EE /* MapKit.framework */,
 				4FDB6BFF1D78EAF200B668EE /* traffic2 */,
 				4FDB6C1C1D78EAF200B668EE /* traffic2Tests */,
 				4FDB6C271D78EAF200B668EE /* traffic2UITests */,
