@@ -8,15 +8,6 @@
         <!--First-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
-                <searchDisplayController id="I0S-Hf-7py">
-                    <connections>
-                        <outlet property="delegate" destination="9pv-A4-QxB" id="DEQ-iH-UP3"/>
-                        <outlet property="searchContentsController" destination="9pv-A4-QxB" id="Zbs-D0-9o1"/>
-                        <outlet property="searchResultsDataSource" destination="9pv-A4-QxB" id="6Gw-Xa-9HP"/>
-                        <outlet property="searchResultsDelegate" destination="9pv-A4-QxB" id="e14-MR-mt3"/>
-                    </connections>
-                </searchDisplayController>
                 <viewController id="9pv-A4-QxB" customClass="FirstViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Ia1-K6-d13"/>
@@ -65,8 +56,75 @@
                         <outlet property="searchText" destination="C39-BQ-Tif" id="3t3-tw-7HA"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="I0S-Hf-7py">
+                    <connections>
+                        <outlet property="delegate" destination="9pv-A4-QxB" id="DEQ-iH-UP3"/>
+                        <outlet property="searchContentsController" destination="9pv-A4-QxB" id="Zbs-D0-9o1"/>
+                        <outlet property="searchResultsDataSource" destination="9pv-A4-QxB" id="6Gw-Xa-9HP"/>
+                        <outlet property="searchResultsDelegate" destination="9pv-A4-QxB" id="e14-MR-mt3"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="750" y="-320"/>
+        </scene>
+        <!--Address Detail View Controller-->
+        <scene sceneID="Kvd-I7-aXJ">
+            <objects>
+                <viewController storyboardIdentifier="AddressDetailViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="LEf-fm-Dio" customClass="AddressDetailViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nMO-wL-Odd"/>
+                        <viewControllerLayoutGuide type="bottom" id="pf7-99-xcr"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="OJ5-3K-uZw">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" editable="NO" textAlignment="natural" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wli-nc-WND">
+                                <rect key="frame" x="51" y="28" width="498" height="128"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <accessibility key="accessibilityConfiguration">
+                                    <accessibilityTraits key="traits" notEnabled="YES"/>
+                                </accessibility>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jc8-TI-69p">
+                                <rect key="frame" x="9" y="0.0" width="46" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <segue destination="9pv-A4-QxB" kind="popoverPresentation" popoverAnchorView="jc8-TI-69p" id="gUe-J1-bS6">
+                                        <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
+                                    </segue>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iM3-uj-I1Z">
+                                <rect key="frame" x="243" y="285" width="115" height="30"/>
+                                <state key="normal" title="Get Traffic Data"/>
+                                <connections>
+                                    <action selector="getTrafficData:" destination="LEf-fm-Dio" eventType="touchUpInside" id="w09-Pw-nEm"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="4kH-34-Pu3"/>
+                            <constraint firstItem="iM3-uj-I1Z" firstAttribute="top" secondItem="wli-nc-WND" secondAttribute="bottom" constant="20" id="C4C-QO-F8M"/>
+                            <constraint firstItem="jc8-TI-69p" firstAttribute="top" secondItem="OJ5-3K-uZw" secondAttribute="top" constant="5" id="R3h-yg-Ngi"/>
+                            <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerY" secondItem="OJ5-3K-uZw" secondAttribute="centerY" id="bv0-up-jaO"/>
+                            <constraint firstItem="wli-nc-WND" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="30" id="flp-Xt-FLM"/>
+                            <constraint firstItem="jc8-TI-69p" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="5" id="jxo-an-JDM"/>
+                            <constraint firstItem="wli-nc-WND" firstAttribute="top" secondItem="nMO-wL-Odd" secondAttribute="bottom" constant="30" id="k4h-wL-8aI"/>
+                            <constraint firstAttribute="trailing" secondItem="wli-nc-WND" secondAttribute="trailing" constant="30" id="njX-Uk-sTx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textView" destination="wli-nc-WND" id="bl1-2T-j2f"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uX0-su-GCj" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1394" y="-320"/>
         </scene>
         <!--Second-->
         <scene sceneID="wg7-f3-ORb">
@@ -132,4 +190,7 @@
         <image name="first" width="30" height="30"/>
         <image name="second" width="30" height="30"/>
     </resources>
+    <inferredMetricsTieBreakers>
+        <segue reference="gUe-J1-bS6"/>
+    </inferredMetricsTieBreakers>
 </document>

@@ -10,8 +10,7 @@
 #import <MapKit/MapKit.h>
 #import <CoreLocation/CoreLocation.h>
 
-@interface FirstViewController : UIViewController<CLLocationManagerDelegate>
-
+@interface FirstViewController : UIViewController<CLLocationManagerDelegate,MKMapViewDelegate>
 
 @end
 
