@@ -16,6 +16,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.textView setText:self.addressString];
+    
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     // Do any additional setup after loading the view.
 }
 
@@ -25,7 +27,16 @@
 }
 - (IBAction)getTrafficData:(id)sender {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:nil];
-    [self presentViewController:self.mainViewController animated:true completion:nil];
+    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self dismissViewControllerAnimated:YES completion:nil];
+    //[self presentViewController:self.mainViewController animated:true completion:nil];
+}
+- (IBAction)removePin:(id)sender {
+    for (MKPointAnnotation *pointAnno in self.mainViewController.mapView.annotations) {
+        if ([pointAnno.title isEqualToString:self.addressString]) {
+            [self.mainViewController.mapView removeAnnotation:pointAnno];
+        }
+    }
 }
 
 /*

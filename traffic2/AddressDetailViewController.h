@@ -13,6 +13,6 @@
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 
 @property (nonatomic, strong) NSString *addressString;
-@property (nonatomic, strong) FirstViewController *mainViewController;
+@property (nonatomic, retain) FirstViewController *mainViewController;
 
 @end

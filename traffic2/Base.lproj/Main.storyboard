@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="95p-VT-UZ1">
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" mapType="standard" showsUserLocation="YES" translatesAutoresizingMaskIntoConstraints="NO" id="95p-VT-UZ1">
                                 <rect key="frame" x="0.0" y="30" width="600" height="521"/>
                             </mapView>
                             <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gBN-Ac-psk">
@@ -98,6 +98,13 @@
                                     </segue>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zyn-gk-plc">
+                                <rect key="frame" x="247" y="328" width="106" height="30"/>
+                                <state key="normal" title="Removed Pin"/>
+                                <connections>
+                                    <action selector="removePin:" destination="LEf-fm-Dio" eventType="touchUpInside" id="Pyi-Ev-2Xi"/>
+                                </connections>
+                            </button>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iM3-uj-I1Z">
                                 <rect key="frame" x="243" y="285" width="115" height="30"/>
                                 <state key="normal" title="Get Traffic Data"/>
@@ -111,7 +118,9 @@
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="4kH-34-Pu3"/>
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="top" secondItem="wli-nc-WND" secondAttribute="bottom" constant="20" id="C4C-QO-F8M"/>
                             <constraint firstItem="jc8-TI-69p" firstAttribute="top" secondItem="OJ5-3K-uZw" secondAttribute="top" constant="5" id="R3h-yg-Ngi"/>
+                            <constraint firstItem="Zyn-gk-plc" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="Zxh-Eu-5gU"/>
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerY" secondItem="OJ5-3K-uZw" secondAttribute="centerY" id="bv0-up-jaO"/>
+                            <constraint firstItem="Zyn-gk-plc" firstAttribute="top" secondItem="iM3-uj-I1Z" secondAttribute="bottom" constant="20" id="fGt-IJ-WSl"/>
                             <constraint firstItem="wli-nc-WND" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="30" id="flp-Xt-FLM"/>
                             <constraint firstItem="jc8-TI-69p" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="5" id="jxo-an-JDM"/>
                             <constraint firstItem="wli-nc-WND" firstAttribute="top" secondItem="nMO-wL-Odd" secondAttribute="bottom" constant="30" id="k4h-wL-8aI"/>
