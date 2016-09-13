@@ -51,9 +51,6 @@ NSOperationQueue *queue;
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
-    
-    MKPointAnnotation *point = [[MKPointAnnotation alloc]init];
-    point.coordinate = CLLocationCoordinate2DMake(38.785835000000001, -121.406517);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
@@ -115,9 +112,6 @@ NSOperationQueue *queue;
     }
     
     annotationView.rightCalloutAccessoryView =  [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
-    annotationView.frame = CGRectMake(0, 0, 67, 26);
-    annotationView.backgroundColor = [UIColor orangeColor];
-    [annotationView setAnimatesDrop:YES];
     return annotationView;
 }
 
