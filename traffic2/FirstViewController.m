@@ -22,6 +22,7 @@ NSLock *trafficIncidentLevelLock;
 const NSString *TapPoint = @"TapPoint";
 const NSString *SearchPoint = @"SearchPoint";
 const NSString *TrafficPoint = @"TrafficPoint";
+NSOperationQueue *queue;
 
 @implementation FirstViewController
 
@@ -44,10 +45,15 @@ const NSString *TrafficPoint = @"TrafficPoint";
     self.mapView.delegate = self;
     
     trafficIncidentLevelLock = [[NSLock alloc]init];
+    queue = [[NSOperationQueue alloc]init];
+    queue.maxConcurrentOperationCount = 5;
     
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
+    
+    MKPointAnnotation *point = [[MKPointAnnotation alloc]init];
+    point.coordinate = CLLocationCoordinate2DMake(38.785835000000001, -121.406517);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
@@ -81,7 +87,9 @@ const NSString *TrafficPoint = @"TrafficPoint";
     }];
 }
 
-//- (MKAnnotationView *)retur
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
+    NSLog(@"hello");
+}
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     MKPinAnnotationView *annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"annoView"];
@@ -101,11 +109,15 @@ const NSString *TrafficPoint = @"TrafficPoint";
         }
     }else if ([annotation isKindOfClass:[MKPointAnnotation class]]) {
         annotationView.pinTintColor = [UIColor blackColor];
+        annotationView.enabled = YES;
     }else {
         annotationView.pinTintColor = [UIColor greenColor];
     }
     
     annotationView.rightCalloutAccessoryView =  [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    annotationView.frame = CGRectMake(0, 0, 67, 26);
+    annotationView.backgroundColor = [UIColor orangeColor];
+    [annotationView setAnimatesDrop:YES];
     return annotationView;
 }
 
@@ -115,8 +127,8 @@ const NSString *TrafficPoint = @"TrafficPoint";
     addressDetailViewController.addressString = [view.annotation title];
     self.currentPoint = [view.annotation coordinate];
     addressDetailViewController.mainViewController = self;
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [self presentViewController:addressDetailViewController animated:YES completion:nil];
+    [self addChildViewController:addressDetailViewController];
+    [self.view addSubview:addressDetailViewController.view];
 }
 
 - (MKPolylineRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(nonnull id<MKOverlay>)overlay {
@@ -162,8 +174,24 @@ const NSString *TrafficPoint = @"TrafficPoint";
     }];
 }
 
+- (void)plotTrafficRouteThread:(NSDictionary *)params {
+    MKDirectionsRequest *directionRequest = params[@"request"];
+    int severity = [params[@"severity"] intValue];
+    [trafficIncidentLevelLock lock];
+    self.trafficIncidentLevel = severity;
+    MKDirections *directions = [[MKDirections alloc] initWithRequest:directionRequest];
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
+        if (!err) {
+            NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"expectedTravelTime" ascending:YES];
+            NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
+            [self plotTrafficOnMap: [sortedArray firstObject]];
+        }
+    }];
+}
+
 - (void)plotTrafficRoute:(NSArray *)trafficDic {
     int i = 0;
+    int z = 0;
     for (NSDictionary *incidents in trafficDic) {
         MyAnnotation *trafficIncidentPoint = [[MyAnnotation alloc] init];
         
@@ -175,10 +203,8 @@ const NSString *TrafficPoint = @"TrafficPoint";
         trafficIncidentPoint.source = sourcePlaceMark;
         
         trafficIncidentPoint.severity = [[incidents objectForKey:@"severity"] intValue];
-        [trafficIncidentLevelLock lock];
-        self.trafficIncidentLevel = trafficIncidentPoint.severity;
         trafficIncidentPoint.type = [[incidents objectForKey:@"type"] intValue];
-    
+        
         NSString *prefix = @"/Date(";
         NSString *suffic = @")/";
         NSString *startTimeJson = [incidents objectForKey:@"start"];
@@ -191,12 +217,10 @@ const NSString *TrafficPoint = @"TrafficPoint";
         }
         trafficIncidentPoint.startTime = [NSDate dateWithTimeIntervalSince1970: [startTimeJson doubleValue]/1000.0];
         trafficIncidentPoint.endTime = [NSDate dateWithTimeIntervalSince1970: [endTimeJson doubleValue]/1000.0];
-
         
         trafficIncidentPoint.roadClosed = [[incidents objectForKey:@"roadClosed"] boolValue];
         trafficIncidentPoint.info = [incidents objectForKey:@"description"];
         trafficIncidentPoint.lane = [incidents objectForKey:@"lane"];
-
         
         if ([incidents objectForKey:@"toPoint"]) {
             
@@ -205,25 +229,25 @@ const NSString *TrafficPoint = @"TrafficPoint";
             MKPlacemark *destinationPlaceMark = [[MKPlacemark alloc]initWithCoordinate:destinationPoint addressDictionary:nil];
             MKMapItem *destinationItem = [[MKMapItem alloc]initWithPlacemark:destinationPlaceMark];
             trafficIncidentPoint.destination = destinationPlaceMark;
-            [self.mapView addAnnotation:trafficIncidentPoint];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^(void){
+                [self.mapView addAnnotation:trafficIncidentPoint];
+            }];
             
             MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
             request.source = sourceItem;
             request.destination = destinationItem;
             request.requestsAlternateRoutes = true;
             request.transportType = MKDirectionsTransportTypeAutomobile;
-            
-            MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
-            [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
-                if (!err) {
-                    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"expectedTravelTime" ascending:YES];
-                    NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
-                    [self plotTrafficOnMap: [sortedArray firstObject]];
-                }
-            }];
+        
+            NSDictionary *params = @{@"request":request, @"severity":[NSNumber numberWithInt:trafficIncidentPoint.severity]};
+            NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(plotTrafficRouteThread:) object:params];
+            [queue addOperation:operation];
+        }else {
+            z++;
         }
         i++;
-        if (i == 2){
+        if (i == 3) {
             break;
         }
     }
@@ -232,10 +256,10 @@ const NSString *TrafficPoint = @"TrafficPoint";
 - (void)plotTrafficOnMap:(MKRoute *)trafficIncRoute {
     [self.mapView addOverlay:trafficIncRoute.polyline];
     if (self.mapView.overlays.count == 1) {
-        [self.mapView setVisibleMapRect:trafficIncRoute.polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0) animated:false];
+        [self.mapView setVisibleMapRect:trafficIncRoute.polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
     }else{
         MKMapRect newRouteBound = MKMapRectUnion(self.mapView.visibleMapRect, trafficIncRoute.polyline.boundingMapRect);
-        [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0) animated:false];
+        [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
     }
 }
 
@@ -259,7 +283,6 @@ const NSString *TrafficPoint = @"TrafficPoint";
             }else {
                 int i = 5;
             }
-            
         }
     }];
     [task resume];

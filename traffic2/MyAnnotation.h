@@ -30,7 +30,7 @@ typedef enum {
     WEATHER
 } TRAFFIC_TYPE;
 
-@interface MyAnnotation : MKPointAnnotation
+@interface MyAnnotation : NSObject<MKAnnotation>
 
 @property (nonatomic, assign, nonnull) CLPlacemark *source;
 @property (nonatomic, assign, nullable) CLPlacemark *destination;
@@ -46,5 +46,7 @@ typedef enum {
 @property (nonatomic, retain, nullable) NSString *lane;
 @property (nonatomic, retain, nullable) NSString *congestion;
 @property (nonatomic, retain, nullable) NSString *detour;
+
+@property (nonatomic, assign)CLLocationCoordinate2D coordinate;
 
 @end

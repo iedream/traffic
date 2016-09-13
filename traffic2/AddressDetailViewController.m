@@ -27,9 +27,12 @@
 }
 - (IBAction)getTrafficData:(id)sender {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:nil];
-    self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [self dismissViewControllerAnimated:YES completion:nil];
-    //[self presentViewController:self.mainViewController animated:true completion:nil];
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
+}
+- (IBAction)backToMap:(id)sender {
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
 }
 - (IBAction)removePin:(id)sender {
     for (MKPointAnnotation *pointAnno in self.mainViewController.mapView.annotations) {
