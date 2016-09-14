@@ -10,6 +10,7 @@
 #import <MapKit/MapKit.h>
 
 typedef enum {
+    NONE,
     LOW_IMPACT,
     MINOR,
     MODERATE,
@@ -30,10 +31,10 @@ typedef enum {
     WEATHER
 } TRAFFIC_TYPE;
 
-@interface MyAnnotation : MKPointAnnotation
+@interface MyPolyLine : MKPolyline
 
-@property (nonatomic, assign, nonnull) CLPlacemark *source;
-@property (nonatomic, assign, nullable) CLPlacemark *destination;
+@property (nonatomic, assign, nonnull) MKPlacemark *source;
+@property (nonatomic, assign, nullable) MKPlacemark *destination;
 
 @property (nonatomic, retain, nonnull) NSDate *startTime;
 @property (nonatomic, retain, nonnull) NSDate *endTime;

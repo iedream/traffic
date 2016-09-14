@@ -8,6 +8,6 @@
 
 #import "MyAnnotation.h"
 
-@implementation MyAnnotation
+@implementation MyPolyLine
 
 @end
