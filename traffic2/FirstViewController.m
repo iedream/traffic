@@ -21,6 +21,7 @@ NSLock *allPointSetLock;
 const NSString *TapPoint = @"TapPoint";
 const NSString *SearchPoint = @"SearchPoint";
 const NSString *TrafficPoint = @"TrafficPoint";
+const long tapArea = 20;
 NSOperationQueue *queue;
 
 @implementation FirstViewController
@@ -46,7 +47,9 @@ NSOperationQueue *queue;
     queue = [[NSOperationQueue alloc]init];
     queue.maxConcurrentOperationCount = 5;
     
-    UITapGestureRecognizer *overlayTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleOverlayTap)];
+    UITapGestureRecognizer *overlayTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleOverlayTap:)];
+    [overlayTap setDelegate:self];
+    [self.mapView addGestureRecognizer:overlayTap];
     
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     
@@ -54,6 +57,17 @@ NSOperationQueue *queue;
 }
 
 - (void) handleOverlayTap:(UIGestureRecognizer*)tap {
+    CGPoint tapPoint = [tap locationInView:self.mapView];
+    CLLocationCoordinate2D tapCoord = [self.mapView convertPoint:tapPoint toCoordinateFromView:self.mapView];
+    MKMapPoint tapMapPoint = MKMapPointForCoordinate(tapCoord);
+    MKMapRect tapRegion = MKMapRectMake(tapMapPoint.x, tapMapPoint.y, 1, 0.00005);
+    for (id<MKOverlay> overlay in self.mapView.overlays) {
+        MKPolyline *polygon = (MKPolyline*)overlay;
+        MKMapRect newRegion = [polygon boundingMapRect];
+        if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
+            int i = 6;
+        }
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
@@ -183,6 +197,7 @@ NSOperationQueue *queue;
             NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(plotTrafficRouteThread:) object:param];
             [queue addOperation:operation];
         }
+        break;
     }
 }
 

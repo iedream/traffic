@@ -11,7 +11,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import "MyAnnotation.h"
 
-@interface FirstViewController : UIViewController<CLLocationManagerDelegate,MKMapViewDelegate, MKAnnotation>
+@interface FirstViewController : UIViewController<CLLocationManagerDelegate,MKMapViewDelegate, MKAnnotation, UIGestureRecognizerDelegate>
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @end
 
