@@ -10,7 +10,7 @@
 #import <MapKit/MapKit.h>
 
 typedef enum {
-    NONE,
+    NO_SEVERITY,
     LOW_IMPACT,
     MINOR,
     MODERATE,
@@ -18,6 +18,7 @@ typedef enum {
 } SEVERITY;
 
 typedef enum {
+    NO_TRAFFIC_TYPE,
     ACCIDENT,
     CONGESTION,
     DISABLED_VEHICLE,

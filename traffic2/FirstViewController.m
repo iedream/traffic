@@ -18,11 +18,13 @@
 
 const NSString *bingMapKey = @"AsHdhDvy5ci5JminQIzQLu3Wgl6pLToeZ-vkDoLkc_SHD2KferVhJ_v_VEz8jSfd";
 NSLock *allPointSetLock;
+NSLock *waitForAddress;
 const NSString *TapPoint = @"TapPoint";
 const NSString *SearchPoint = @"SearchPoint";
 const NSString *TrafficPoint = @"TrafficPoint";
 const long tapArea = 20;
 NSOperationQueue *queue;
+NSString *pointAddress;
 
 @implementation FirstViewController
 
@@ -44,6 +46,8 @@ NSOperationQueue *queue;
     self.mapView.delegate = self;
     
     allPointSetLock = [[NSLock alloc]init];
+    waitForAddress = [[NSLock alloc]init];
+    [waitForAddress lock];
     queue = [[NSOperationQueue alloc]init];
     queue.maxConcurrentOperationCount = 5;
     
@@ -62,10 +66,31 @@ NSOperationQueue *queue;
     MKMapPoint tapMapPoint = MKMapPointForCoordinate(tapCoord);
     MKMapRect tapRegion = MKMapRectMake(tapMapPoint.x, tapMapPoint.y, 1, 0.00005);
     for (id<MKOverlay> overlay in self.mapView.overlays) {
-        MKPolyline *polygon = (MKPolyline*)overlay;
+        MyPolyLine *polygon = (MyPolyLine*)overlay;
         MKMapRect newRegion = [polygon boundingMapRect];
         if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
-            int i = 6;
+            TrafficRouteViewController *trafficRouteViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TrafficRouteViewController"];
+            [self convertlocationIntoString:polygon.source.location.coordinate];
+            [waitForAddress lock];
+            NSString *sourceAdd = pointAddress;
+            [self convertlocationIntoString:polygon.destination.location.coordinate];
+            [waitForAddress lock];
+            NSString *destinationAdd = pointAddress;
+            NSDictionary *trafficDic = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                        [NSNumber numberWithInt:polygon.severity], @"severity",
+                                        [NSNumber numberWithInt:polygon.type], @"type",
+                                        [NSNumber numberWithBool:polygon.roadClosed], @"roadClosed",
+                                        polygon.startTime, @"startTime",
+                                        polygon.endTime, @"endTime",
+                                        polygon.source, sourceAdd,
+                                        polygon.destination, destinationAdd,
+                                        polygon.info, @"description",
+                                        polygon.detour, @"detour",
+                                        polygon.lane, @"lane",
+                                        polygon.congestion, @"congestion", nil];
+            [trafficRouteViewController initWithTraficInfoDic:trafficDic];
+            [self addChildViewController:trafficRouteViewController];
+            [self.view addSubview:trafficRouteViewController.view];
         }
     }
 }
@@ -83,21 +108,34 @@ NSOperationQueue *queue;
 - (void) handleLongPress:(UILongPressGestureRecognizer *)recognizer {
     CGPoint point = [recognizer locationInView:self.mapView];
     CLLocationCoordinate2D tapPoint = [self.mapView convertPoint:point toCoordinateFromView:self.view];
-    CLLocation *location = [[CLLocation alloc] initWithLatitude:tapPoint.latitude longitude:tapPoint.longitude];
+
+    MKPointAnnotation *resultPoint = [[MKPointAnnotation alloc]init];
+    resultPoint.coordinate = tapPoint;
+    [self convertlocationIntoString:tapPoint];
+    [waitForAddress lock];
+    if (pointAddress) {
+        resultPoint.title = pointAddress;
+    }else{
+        resultPoint.title = @"Drop Pin";
+    }
+    [self.mapView addAnnotation:resultPoint];
+}
+
+- (void)convertlocationIntoString:(CLLocationCoordinate2D)point {
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
     CLGeocoder *geocoder = [[CLGeocoder alloc] init];
     [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
-        MKPointAnnotation *point = [[MKPointAnnotation alloc]init];
-        point.coordinate = tapPoint;
         
         if ([placemarks count] > 0) {
             CLPlacemark *placeMark = [placemarks firstObject];
             NSArray *address = placeMark.addressDictionary[@"FormattedAddressLines"];
-            point.title = [address componentsJoinedByString:@", "];
+            pointAddress = [address componentsJoinedByString:@", "];
         }else{
-            point.title = @"Drop Pin";
+            pointAddress = nil;
         }
-
-        [self.mapView addAnnotation:point];
+        
+        [waitForAddress unlock];
+        
     }];
 }
 
@@ -197,7 +235,6 @@ NSOperationQueue *queue;
             NSInvocationOperation *operation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(plotTrafficRouteThread:) object:param];
             [queue addOperation:operation];
         }
-        break;
     }
 }
 
