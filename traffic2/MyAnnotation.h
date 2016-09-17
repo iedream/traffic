@@ -34,8 +34,8 @@ typedef enum {
 
 @interface MyPolyLine : MKPolyline
 
-@property (nonatomic, assign, nonnull) MKPlacemark *source;
-@property (nonatomic, assign, nullable) MKPlacemark *destination;
+@property (nonatomic, assign) CLLocationCoordinate2D source;
+@property (nonatomic, assign) CLLocationCoordinate2D destination;
 
 @property (nonatomic, retain, nonnull) NSDate *startTime;
 @property (nonatomic, retain, nonnull) NSDate *endTime;

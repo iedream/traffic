@@ -17,9 +17,10 @@
 @property (weak, nonatomic) IBOutlet UITextField *startLocationTextField;
 @property (weak, nonatomic) IBOutlet UITextField *endLocationTextField;
 @property (weak, nonatomic) IBOutlet UITextView *descriptionTextView;
+@property (weak, nonatomic) IBOutlet UITextView *detourTextView;
 @property (weak, nonatomic) IBOutlet UITextField *detourTextField;
 @property (weak, nonatomic) IBOutlet UITextField *laneTextField;
 @property (weak, nonatomic) IBOutlet UITextField *congestionTextField;
 
-- (void)initWithTraficInfoDic:(NSDictionary*)dict;
+@property (strong, nonatomic) NSDictionary *infoDic;
 @end

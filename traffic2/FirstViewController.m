@@ -5,9 +5,9 @@
 //  Created by Catherine Zhao on 2016-09-01.
 //  Copyright © 2016 Catherine. All rights reserved.
 //
-
 #import "FirstViewController.h"
 #import "AddressDetailViewController.h"
+
 
 @interface FirstViewController ()
 @property (nonatomic, strong)CLLocationManager *locationManager;
@@ -16,15 +16,16 @@
 @property (nonatomic, assign)CLLocationCoordinate2D currentPoint;
 @end
 
+
 const NSString *bingMapKey = @"AsHdhDvy5ci5JminQIzQLu3Wgl6pLToeZ-vkDoLkc_SHD2KferVhJ_v_VEz8jSfd";
 NSLock *allPointSetLock;
-NSLock *waitForAddress;
 const NSString *TapPoint = @"TapPoint";
 const NSString *SearchPoint = @"SearchPoint";
 const NSString *TrafficPoint = @"TrafficPoint";
 const long tapArea = 20;
 NSOperationQueue *queue;
-NSString *pointAddress;
+NSString *sourceAddress;
+NSString *destinationAddress;
 
 @implementation FirstViewController
 
@@ -46,17 +47,14 @@ NSString *pointAddress;
     self.mapView.delegate = self;
     
     allPointSetLock = [[NSLock alloc]init];
-    waitForAddress = [[NSLock alloc]init];
-    [waitForAddress lock];
     queue = [[NSOperationQueue alloc]init];
     queue.maxConcurrentOperationCount = 5;
     
     UITapGestureRecognizer *overlayTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleOverlayTap:)];
     [overlayTap setDelegate:self];
     [self.mapView addGestureRecognizer:overlayTap];
-    
+
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
 }
 
@@ -70,27 +68,27 @@ NSString *pointAddress;
         MKMapRect newRegion = [polygon boundingMapRect];
         if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
             TrafficRouteViewController *trafficRouteViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TrafficRouteViewController"];
-            [self convertlocationIntoString:polygon.source.location.coordinate];
-            [waitForAddress lock];
-            NSString *sourceAdd = pointAddress;
-            [self convertlocationIntoString:polygon.destination.location.coordinate];
-            [waitForAddress lock];
-            NSString *destinationAdd = pointAddress;
-            NSDictionary *trafficDic = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                        [NSNumber numberWithInt:polygon.severity], @"severity",
-                                        [NSNumber numberWithInt:polygon.type], @"type",
-                                        [NSNumber numberWithBool:polygon.roadClosed], @"roadClosed",
-                                        polygon.startTime, @"startTime",
-                                        polygon.endTime, @"endTime",
-                                        polygon.source, sourceAdd,
-                                        polygon.destination, destinationAdd,
-                                        polygon.info, @"description",
-                                        polygon.detour, @"detour",
-                                        polygon.lane, @"lane",
-                                        polygon.congestion, @"congestion", nil];
-            [trafficRouteViewController initWithTraficInfoDic:trafficDic];
-            [self addChildViewController:trafficRouteViewController];
-            [self.view addSubview:trafficRouteViewController.view];
+            [self convertlocationIntoString:polygon.source completionHandler:^(NSString *address) {
+                sourceAddress = address;
+                [self convertlocationIntoString:polygon.destination completionHandler:^(NSString *address) {
+                    destinationAddress = address;
+                    NSDictionary *trafficDic = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                                [NSNumber numberWithInt:polygon.severity], @"severity",
+                                                [NSNumber numberWithInt:polygon.type], @"type",
+                                                [NSNumber numberWithBool:polygon.roadClosed], @"roadClosed",
+                                                polygon.startTime, @"startTime",
+                                                polygon.endTime, @"endTime",
+                                                sourceAddress, @"source",
+                                                destinationAddress, @"destination",
+                                                polygon.info, @"description",
+                                                polygon.detour, @"detour",
+                                                polygon.lane, @"lane",
+                                                polygon.congestion, @"congestion", nil];
+                    trafficRouteViewController.infoDic = trafficDic;
+                    [self addChildViewController:trafficRouteViewController];
+                    [self.view addSubview:trafficRouteViewController.view];
+                }];
+            }];
         }
     }
 }
@@ -108,34 +106,28 @@ NSString *pointAddress;
 - (void) handleLongPress:(UILongPressGestureRecognizer *)recognizer {
     CGPoint point = [recognizer locationInView:self.mapView];
     CLLocationCoordinate2D tapPoint = [self.mapView convertPoint:point toCoordinateFromView:self.view];
-
+    
     MKPointAnnotation *resultPoint = [[MKPointAnnotation alloc]init];
     resultPoint.coordinate = tapPoint;
-    [self convertlocationIntoString:tapPoint];
-    [waitForAddress lock];
-    if (pointAddress) {
-        resultPoint.title = pointAddress;
-    }else{
-        resultPoint.title = @"Drop Pin";
-    }
-    [self.mapView addAnnotation:resultPoint];
+    
+    [self convertlocationIntoString:tapPoint completionHandler:^(NSString *address){
+        resultPoint.title = address;
+        [self.mapView addAnnotation:resultPoint];
+    }];
 }
 
-- (void)convertlocationIntoString:(CLLocationCoordinate2D)point {
+- (void)convertlocationIntoString:(CLLocationCoordinate2D)point completionHandler:(void(^)(NSString*))completionBlock {
     CLLocation *location = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
     CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
     [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
-        
         if ([placemarks count] > 0) {
             CLPlacemark *placeMark = [placemarks firstObject];
             NSArray *address = placeMark.addressDictionary[@"FormattedAddressLines"];
-            pointAddress = [address componentsJoinedByString:@", "];
+            completionBlock([address componentsJoinedByString:@", "]);
         }else{
-            pointAddress = nil;
+            completionBlock(nil);
         }
-        
-        [waitForAddress unlock];
-        
     }];
 }
 
@@ -202,10 +194,12 @@ NSString *pointAddress;
 
 - (IBAction)searchMethod:(id)sender {
     CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
     [geocoder geocodeAddressString:self.searchText.text completionHandler:^(NSArray* placemarks, NSError* error){
         for (CLPlacemark *placeMark in placemarks){
             MKPlacemark *realPlaceMark = [[MKPlacemark alloc]initWithPlacemark:placeMark];
             [self.mapView addAnnotation:realPlaceMark];
+        
             MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(realPlaceMark.coordinate, 800, 800);
             [self.mapView setRegion:[self.mapView regionThatFits:region] animated:YES];
         }
@@ -213,18 +207,31 @@ NSString *pointAddress;
 }
 
 //- (void)plotTrafficRouteThread:(NSDictionary *)params {
+
 //    MKDirectionsRequest *directionRequest = params[@"request"];
+
 //    int severity = [params[@"severity"] intValue];
+
 //    [trafficIncidentLevelLock lock];
+
 //    self.trafficIncidentLevel = severity;
+
 //    MKDirections *directions = [[MKDirections alloc] initWithRequest:directionRequest];
+
 //    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
+
 //        if (!err) {
+
 //            NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:YES];
+
 //            NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
+
 //            [self plotTrafficOnMap: [sortedArray firstObject]];
+
 //        }
+
 //    }];
+
 //}
 
 - (void)plotTrafficRoute:(NSArray *)trafficDic {
@@ -245,10 +252,12 @@ NSString *pointAddress;
     
     NSArray *sourceArray = [[incidentDic objectForKey:@"point"] objectForKey:@"coordinates"];
     CLLocationCoordinate2D sourcePoint = CLLocationCoordinate2DMake([sourceArray[0] floatValue], [sourceArray[1] floatValue]);
+    
     NSArray *destinationArray = [[incidentDic objectForKey:@"toPoint"] objectForKey:@"coordinates"];
     CLLocationCoordinate2D destinationPoint = CLLocationCoordinate2DMake([destinationArray[0] floatValue], [destinationArray[1] floatValue]);
+    
     [allPointSetLock lock];
-    pointExisted = [self pointExistAlready:allPoints coordinate:sourcePoint];;
+    pointExisted = [self pointExistAlready:allPoints coordinate:sourcePoint];
     if (pointExisted) {
         [allPointSetLock unlock];
         return;
@@ -264,11 +273,8 @@ NSString *pointAddress;
     trafficCoorArray[0] = sourcePoint;
     trafficCoorArray[1] = destinationPoint;
     MyPolyLine *trafficLane = [MyPolyLine polylineWithCoordinates:trafficCoorArray count:2];
-    
-    MKPlacemark *sourcePlaceMark = [[MKPlacemark alloc]initWithCoordinate:sourcePoint addressDictionary:nil];
-    trafficLane.source = sourcePlaceMark;
-    MKPlacemark *destinationPlaceMark = [[MKPlacemark alloc]initWithCoordinate:destinationPoint addressDictionary:nil];
-    trafficLane.destination = destinationPlaceMark;
+    trafficLane.source = sourcePoint;
+    trafficLane.destination = destinationPoint;
     
     trafficLane.severity = [[incidentDic objectForKey:@"severity"] intValue];
     trafficLane.type = [[incidentDic objectForKey:@"type"] intValue];
@@ -313,7 +319,6 @@ NSString *pointAddress;
 
 - (void)downloadAccident:(CLLocationCoordinate2D )address{
     NSString *addressLine =  [NSString stringWithFormat:@"%f,%f,%f,%f", (int)address.latitude-0.5, (int)address.longitude-0.5, (int)address.latitude+0.5, (int)address.longitude+0.5];
-   
     NSString *url = [NSString stringWithFormat:@"http://dev.virtualearth.net/REST/v1/Traffic/Incidents/%@/true?t=1,8,9&s=2,3,4&key=%@",addressLine, bingMapKey];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"GET"];
@@ -325,28 +330,42 @@ NSString *pointAddress;
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             NSError *err;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            
             if ([httpResponse statusCode] == 200){
                 NSArray *trafficIncidents = [[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject];
                 [self plotTrafficRoute:trafficIncidents];
-            }else {
-                int i = 5;
             }
         }
     }];
     [task resume];
 }
 
+
+
 -(void)traffic {
+    
     //            MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+    
     //            request.source = sourceItem;
+    
     //            request.destination = destinationItem;
+    
     //            request.requestsAlternateRoutes = true;
+    
     //            request.transportType = MKDirectionsTransportTypeAutomobile;
+    
 }
 
+
+
 - (void)didReceiveMemoryWarning {
+    
     [super didReceiveMemoryWarning];
+    
     // Dispose of any resources that can be recreated.
+    
 }
+
+
 
 @end

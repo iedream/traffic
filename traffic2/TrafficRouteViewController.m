@@ -13,49 +13,93 @@
 
 @end
 
+
+
 @implementation TrafficRouteViewController
 
-- (void)initWithTraficInfoDic:(NSDictionary*)dict {
-    [self.severityTextField setText:[self convertSeverityCode:[dict[@"severity"]intValue]]];
-    [self.typeTextField setText:[self convertTypeCode:[dict[@"type"]intValue]]];
-    [self.roadClosedTextField setText:[self convertRoadClosed:dict[@"roadClosed"]]];
-    [self.startTimeTextField setText:dict[@"startTime"]];
-    [self.endTimeTextField setText:dict[@"endTime"]];
+- (void)viewDidLoad {
     
-    [self.startLocationTextField setText:dict[@"startLocation"]];
+    [super viewDidLoad];
     
-    if (dict[@"endLocation"]) {
-        [self.endLocationTextField setText:dict[@"endLocation"]];
-    }else {
-        [self.endLocationTextField setText:@"No End Location Info"];
-    }
-    if (dict[@"description"]) {
-        [self.descriptionTextView setText:dict[@"description"]];
-    }else {
-        [self.descriptionTextView setText:@"No Traffic Description Available"];
-    }
-    
-    if (dict[@"detour"]) {
-        [self.detourTextField setText:dict[@"detour"]];
-    }else {
-        [self.detourTextField setText:@"No Traffic Detour Info Available"];
-    }
-    
-    if (dict[@"lane"]) {
-        [self.laneTextField setText:dict[@"lane"]];
-    }else {
-        [self.laneTextField setText:@"No Traffic Lane Info Available"];
-    }
-    
-    if (dict[@"congestion"]) {
-        [self.congestionTextField setText:dict[@"congestion"]];
-    }else {
-        [self.congestionTextField setText:@"No Traffic Congestion Info Available"];
+    if (self.infoDic) {
+        
+        [self.severityTextField setText:[self convertSeverityCode:[self.infoDic[@"severity"]intValue]]];
+        [self setTextFieldProperties:self.severityTextField];
+        
+        [self.typeTextField setText:[self convertTypeCode:[self.infoDic[@"type"]intValue]]];
+        [self setTextFieldProperties:self.typeTextField];
+        
+        [self.roadClosedTextField setText:[self convertRoadClosed:self.infoDic[@"roadClosed"]]];
+        [self setTextFieldProperties:self.roadClosedTextField];
+        
+        [self.startTimeTextField setText:[self convertTime:self.infoDic[@"startTime"]]];
+        [self setTextFieldProperties:self.startTimeTextField];
+        
+        [self.endTimeTextField setText:[self convertTime:self.infoDic[@"endTime"]]];
+        [self setTextFieldProperties:self.endTimeTextField];
+        
+        [self.startLocationTextField setText:self.infoDic[@"startLocation"]];
+        [self setTextFieldProperties:self.startLocationTextField];
+        
+        if (self.infoDic[@"endLocation"]) {
+            [self.endLocationTextField setText:self.infoDic[@"endLocation"]];
+        }else {
+            [self.endLocationTextField setText:@"No End Location Info"];
+        }
+        [self setTextFieldProperties:self.endLocationTextField];
+        
+        if (self.infoDic[@"description"]) {
+            [self.descriptionTextView setText:self.infoDic[@"description"]];
+        }else {
+            [self.descriptionTextView setText:@"No Traffic Description Available"];
+        }
+        [self setTextViewProperties:self.descriptionTextView];
+        
+        if (self.infoDic[@"detour"]) {
+            [self.detourTextView setText:self.infoDic[@"detour"]];
+        }else {
+            [self.detourTextView setText:@"No Traffic Detour Info Available"];
+        }
+        [self setTextViewProperties:self.detourTextView];
+        
+        if (self.infoDic[@"lane"]) {
+            [self.laneTextField setText:self.infoDic[@"lane"]];
+        }else {
+            [self.laneTextField setText:@"No Traffic Lane Info Available"];
+        }
+        [self setTextFieldProperties:self.laneTextField];
+        
+        if (self.infoDic[@"congestion"]) {
+            [self.congestionTextField setText:self.infoDic[@"congestion"]];
+        }else {
+            [self.congestionTextField setText:@"No Traffic Congestion Info Available"];
+        }
+        [self setTextFieldProperties:self.congestionTextField];
     }
     
 }
 
-- (NSString*)convertRoadClosed:(NSString*)roadClosed {
+-(void)setTextFieldProperties:(UITextField*)textField {
+    [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [textField setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    textField.userInteractionEnabled = false;
+}
+
+
+
+-(void)setTextViewProperties:(UITextView*)textView {
+    [textView setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [textView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+}
+
+- (NSString *)convertTime:(NSDate *)date {
+    NSString *dateString = [NSDateFormatter localizedStringFromDate:[NSDate date]
+                                                          dateStyle:NSDateFormatterMediumStyle
+                                                          timeStyle:NSDateFormatterMediumStyle];
+    return dateString;
+}
+
+- (NSString *)convertRoadClosed:(NSString*)roadClosed {
     return [NSString stringWithFormat:@" %s", [roadClosed boolValue]? "true" : "false"];
 }
 
@@ -76,10 +120,12 @@
         default:
             return @"No Traffic Severity Info Available";
             break;
+            
     }
+    
 }
 
-- (NSString*)convertTypeCode:(TRAFFIC_TYPE)trafficType {
+- (NSString *)convertTypeCode:(TRAFFIC_TYPE)trafficType {
     switch (trafficType) {
         case 1:
             return @"Accident";
@@ -118,11 +164,7 @@
             return @"No Traffic Type Info Available";
             break;
     }
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -131,13 +173,21 @@
 }
 
 /*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
-
+ 
+ #pragma mark - Navigation
+ 
+ 
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ 
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+ 
+ // Get the new view controller using [segue destinationViewController].
+ 
+ // Pass the selected object to the new view controller.
+ 
+ }
+ 
+ */
 @end
+
