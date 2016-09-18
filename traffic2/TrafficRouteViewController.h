@@ -14,11 +14,16 @@
 @property (weak, nonatomic) IBOutlet UITextField *roadClosedTextField;
 @property (weak, nonatomic) IBOutlet UITextField *startTimeTextField;
 @property (weak, nonatomic) IBOutlet UITextField *endTimeTextField;
-@property (weak, nonatomic) IBOutlet UITextField *startLocationTextField;
-@property (weak, nonatomic) IBOutlet UITextField *endLocationTextField;
-@property (weak, nonatomic) IBOutlet UITextView *descriptionTextView;
-@property (weak, nonatomic) IBOutlet UITextView *detourTextView;
-@property (weak, nonatomic) IBOutlet UITextField *detourTextField;
+
+@property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
+@property (strong, nonatomic) UITextView *descriptionTextView;
+@property (weak, nonatomic) IBOutlet UILabel *startLocationLabel;
+@property (strong, nonatomic) UITextView *startLocationTextView;
+@property (weak, nonatomic) IBOutlet UILabel *endLocationLabel;
+@property (strong, nonatomic) UITextView *endLocationTextView;
+@property (weak, nonatomic) IBOutlet UILabel *detourLabel;
+@property (strong, nonatomic) UITextView *detourTextView;
+
 @property (weak, nonatomic) IBOutlet UITextField *laneTextField;
 @property (weak, nonatomic) IBOutlet UITextField *congestionTextField;
 

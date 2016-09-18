@@ -22,6 +22,9 @@
     [super viewDidLoad];
     
     if (self.infoDic) {
+        UISwipeGestureRecognizer *swipeGesture = [[UISwipeGestureRecognizer alloc]initWithTarget:self action:@selector(backToMap)];
+        swipeGesture.direction = UISwipeGestureRecognizerDirectionLeft;
+        [self.view addGestureRecognizer:swipeGesture];
         
         [self.severityTextField setText:[self convertSeverityCode:[self.infoDic[@"severity"]intValue]]];
         [self setTextFieldProperties:self.severityTextField];
@@ -38,29 +41,33 @@
         [self.endTimeTextField setText:[self convertTime:self.infoDic[@"endTime"]]];
         [self setTextFieldProperties:self.endTimeTextField];
         
-        [self.startLocationTextField setText:self.infoDic[@"startLocation"]];
-        [self setTextFieldProperties:self.startLocationTextField];
+        self.startLocationTextView = [[UITextView alloc]initWithFrame:[self setTextViewFrame:self.startLocationLabel]];
+        [self.startLocationTextView setText:self.infoDic[@"source"]];
+        [self setTextView:self.startLocationTextView];
         
-        if (self.infoDic[@"endLocation"]) {
-            [self.endLocationTextField setText:self.infoDic[@"endLocation"]];
+        self.endLocationTextView = [[UITextView alloc]initWithFrame:[self setTextViewFrame:self.endLocationLabel]];
+        if (self.infoDic[@"destination"]) {
+            [self.endLocationTextView setText:self.infoDic[@"destination"]];
         }else {
-            [self.endLocationTextField setText:@"No End Location Info"];
+            [self.endLocationTextView setText:@"No End Location Info"];
         }
-        [self setTextFieldProperties:self.endLocationTextField];
-        
+        [self setTextView:self.endLocationTextView];
+
+        self.descriptionTextView = [[UITextView alloc]initWithFrame:[self setTextViewFrame:self.descriptionLabel]];
         if (self.infoDic[@"description"]) {
             [self.descriptionTextView setText:self.infoDic[@"description"]];
         }else {
             [self.descriptionTextView setText:@"No Traffic Description Available"];
         }
-        [self setTextViewProperties:self.descriptionTextView];
+        [self setTextView:self.descriptionTextView];
         
+        self.detourTextView = [[UITextView alloc]initWithFrame:[self setTextViewFrame:self.detourLabel]];
         if (self.infoDic[@"detour"]) {
             [self.detourTextView setText:self.infoDic[@"detour"]];
         }else {
             [self.detourTextView setText:@"No Traffic Detour Info Available"];
         }
-        [self setTextViewProperties:self.detourTextView];
+        [self setTextView:self.detourTextView];
         
         if (self.infoDic[@"lane"]) {
             [self.laneTextField setText:self.infoDic[@"lane"]];
@@ -72,7 +79,7 @@
         if (self.infoDic[@"congestion"]) {
             [self.congestionTextField setText:self.infoDic[@"congestion"]];
         }else {
-            [self.congestionTextField setText:@"No Traffic Congestion Info Available"];
+            [self.congestionTextField setText:@"No Traffic Congestion Info"];
         }
         [self setTextFieldProperties:self.congestionTextField];
     }
@@ -87,9 +94,14 @@
 
 
 
--(void)setTextViewProperties:(UITextView*)textView {
-    [textView setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
-    [textView setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+-(CGRect)setTextViewFrame:(UILabel*)label{
+    return CGRectMake(20, label.frame.origin.y+label.frame.size.height, self.view.frame.size.width-40, 40);
+}
+
+-(void)setTextView:(UITextView*)textView {
+    textView.layer.borderWidth = 5.0f;
+    textView.layer.borderColor = [[UIColor lightGrayColor]CGColor];
+    [self.view addSubview:textView];
 }
 
 - (NSString *)convertTime:(NSDate *)date {
@@ -165,6 +177,11 @@
             break;
     }
     
+}
+
+- (void)backToMap {
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
 }
 
 - (void)didReceiveMemoryWarning {
