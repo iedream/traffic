@@ -8,11 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "FirstViewController.h"
+#import "GetTrafficViewController.h"
 
 @interface AddressDetailViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 
 @property (nonatomic, strong) NSString *addressString;
+@property (nonatomic, strong) NSString *currentLocationString;
 @property (nonatomic, retain) FirstViewController *mainViewController;
 
 @end

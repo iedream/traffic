@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4F756B641D86458D00C6DE47 /* MyAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F756B631D86458D00C6DE47 /* MyAnnotation.m */; };
 		4F9E428E1D80F1D70046B346 /* AddressDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */; };
+		4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */; };
 		4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */; };
 		4FDB6C021D78EAF200B668EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C011D78EAF200B668EE /* main.m */; };
 		4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C041D78EAF200B668EE /* AppDelegate.m */; };
@@ -45,6 +46,8 @@
 		4F756B631D86458D00C6DE47 /* MyAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyAnnotation.m; sourceTree = "<group>"; };
 		4F9E428C1D80F1D70046B346 /* AddressDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressDetailViewController.h; sourceTree = "<group>"; };
 		4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddressDetailViewController.m; sourceTree = "<group>"; };
+		4F9EA7CC1D8E39DA0039FD6E /* GetTrafficViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetTrafficViewController.h; sourceTree = "<group>"; };
+		4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetTrafficViewController.m; sourceTree = "<group>"; };
 		4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrafficRouteViewController.h; sourceTree = "<group>"; };
 		4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrafficRouteViewController.m; sourceTree = "<group>"; };
 		4FDB6BFD1D78EAF200B668EE /* traffic2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = traffic2.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -138,6 +141,8 @@
 				4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */,
 				4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */,
 				4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */,
+				4F9EA7CC1D8E39DA0039FD6E /* GetTrafficViewController.h */,
+				4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */,
 			);
 			path = traffic2;
 			sourceTree = "<group>";
@@ -301,6 +306,7 @@
 				4FDB6C0B1D78EAF200B668EE /* SecondViewController.m in Sources */,
 				4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */,
 				4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */,
+				4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */,
 				4F756B641D86458D00C6DE47 /* MyAnnotation.m in Sources */,
 				4FDB6C081D78EAF200B668EE /* FirstViewController.m in Sources */,
 				4FDB6C021D78EAF200B668EE /* main.m in Sources */,

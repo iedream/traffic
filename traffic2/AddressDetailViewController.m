@@ -41,6 +41,13 @@
         }
     }
 }
+- (IBAction)getDirection:(id)sender {
+    GetTrafficViewController *getTrafficViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"GetTrafficViewController"];
+    getTrafficViewController.endPointAddress = self.addressString;
+    getTrafficViewController.currentLocationAddress = self.currentLocationString;
+    [self addChildViewController:getTrafficViewController];
+    [self.view addSubview:getTrafficViewController.view];
+}
 
 /*
 #pragma mark - Navigation

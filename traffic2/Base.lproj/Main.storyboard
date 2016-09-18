@@ -110,16 +110,25 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RAs-zZ-0sd">
+                                <rect key="frame" x="214" y="372" width="173" height="30"/>
+                                <state key="normal" title="Get Direction To Here"/>
+                                <connections>
+                                    <action selector="getDirection:" destination="LEf-fm-Dio" eventType="touchUpInside" id="xh1-GK-oIR"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="4kH-34-Pu3"/>
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="top" secondItem="wli-nc-WND" secondAttribute="bottom" constant="20" id="C4C-QO-F8M"/>
+                            <constraint firstItem="RAs-zZ-0sd" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="Cdq-20-1Ty"/>
                             <constraint firstItem="jc8-TI-69p" firstAttribute="top" secondItem="OJ5-3K-uZw" secondAttribute="top" constant="5" id="R3h-yg-Ngi"/>
                             <constraint firstItem="Zyn-gk-plc" firstAttribute="centerX" secondItem="OJ5-3K-uZw" secondAttribute="centerX" id="Zxh-Eu-5gU"/>
                             <constraint firstItem="iM3-uj-I1Z" firstAttribute="centerY" secondItem="OJ5-3K-uZw" secondAttribute="centerY" id="bv0-up-jaO"/>
                             <constraint firstItem="Zyn-gk-plc" firstAttribute="top" secondItem="iM3-uj-I1Z" secondAttribute="bottom" constant="20" id="fGt-IJ-WSl"/>
                             <constraint firstItem="wli-nc-WND" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="30" id="flp-Xt-FLM"/>
+                            <constraint firstItem="RAs-zZ-0sd" firstAttribute="top" secondItem="Zyn-gk-plc" secondAttribute="bottom" constant="20" id="gkj-3W-yiv"/>
                             <constraint firstItem="jc8-TI-69p" firstAttribute="leading" secondItem="OJ5-3K-uZw" secondAttribute="leading" constant="5" id="jxo-an-JDM"/>
                             <constraint firstItem="wli-nc-WND" firstAttribute="top" secondItem="nMO-wL-Odd" secondAttribute="bottom" constant="30" id="k4h-wL-8aI"/>
                             <constraint firstAttribute="trailing" secondItem="wli-nc-WND" secondAttribute="trailing" constant="30" id="njX-Uk-sTx"/>
@@ -132,6 +141,88 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uX0-su-GCj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1394" y="-320"/>
+        </scene>
+        <!--Get Traffic View Controller-->
+        <scene sceneID="pWg-UF-YRf">
+            <objects>
+                <viewController storyboardIdentifier="GetTrafficViewController" id="9bY-f4-AXo" customClass="GetTrafficViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="RYd-Ua-vnz"/>
+                        <viewControllerLayoutGuide type="bottom" id="wcl-R3-6kS"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="LXF-Cy-pjR">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="85q-2P-LaD">
+                                <rect key="frame" x="139" y="124" width="408" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Start" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pHO-5V-f3O">
+                                <rect key="frame" x="82" y="128" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="End" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J3S-5S-6B5">
+                                <rect key="frame" x="82" y="226" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Bvb-Ja-WUh">
+                                <rect key="frame" x="139" y="222" width="408" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PfK-jO-7LH">
+                                <rect key="frame" x="245" y="310" width="111" height="30"/>
+                                <state key="normal" title="Get Direction"/>
+                                <connections>
+                                    <action selector="getDirection:" destination="9bY-f4-AXo" eventType="touchUpInside" id="BGL-Gl-k32"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ru1-Qs-nfc">
+                                <rect key="frame" x="267" y="174" width="67" height="30"/>
+                                <state key="normal" title="Reverse"/>
+                                <connections>
+                                    <action selector="reversePoints:" destination="9bY-f4-AXo" eventType="touchUpInside" id="cs7-0Q-r6C"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RKc-mr-aJK">
+                                <rect key="frame" x="277" y="362" width="46" height="30"/>
+                                <state key="normal" title="Back"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Bvb-Ja-WUh" secondAttribute="trailing" constant="20" id="7fE-sv-PPa"/>
+                            <constraint firstItem="Ru1-Qs-nfc" firstAttribute="top" secondItem="pHO-5V-f3O" secondAttribute="bottom" constant="30" id="8f2-2C-1gb"/>
+                            <constraint firstItem="Bvb-Ja-WUh" firstAttribute="centerY" secondItem="J3S-5S-6B5" secondAttribute="centerY" id="DfU-O8-Al3"/>
+                            <constraint firstItem="Ru1-Qs-nfc" firstAttribute="centerX" secondItem="LXF-Cy-pjR" secondAttribute="centerX" id="EMm-Io-5cj"/>
+                            <constraint firstItem="J3S-5S-6B5" firstAttribute="leading" secondItem="LXF-Cy-pjR" secondAttribute="leading" constant="20" id="Gtt-GJ-ruz"/>
+                            <constraint firstItem="85q-2P-LaD" firstAttribute="leading" secondItem="pHO-5V-f3O" secondAttribute="trailing" constant="20" id="HSz-3R-uf6"/>
+                            <constraint firstItem="RKc-mr-aJK" firstAttribute="centerX" secondItem="LXF-Cy-pjR" secondAttribute="centerX" id="IA9-ps-b2X"/>
+                            <constraint firstItem="PfK-jO-7LH" firstAttribute="centerX" secondItem="LXF-Cy-pjR" secondAttribute="centerX" id="QeK-i6-tVc"/>
+                            <constraint firstItem="Bvb-Ja-WUh" firstAttribute="leading" secondItem="85q-2P-LaD" secondAttribute="leading" id="V5d-Wv-yIQ"/>
+                            <constraint firstItem="85q-2P-LaD" firstAttribute="centerY" secondItem="pHO-5V-f3O" secondAttribute="centerY" id="X96-fd-Z2z"/>
+                            <constraint firstItem="PfK-jO-7LH" firstAttribute="top" secondItem="J3S-5S-6B5" secondAttribute="bottom" constant="30" id="XLa-ck-CCx"/>
+                            <constraint firstItem="J3S-5S-6B5" firstAttribute="top" secondItem="Ru1-Qs-nfc" secondAttribute="bottom" constant="30" id="gkq-Th-AJh"/>
+                            <constraint firstItem="pHO-5V-f3O" firstAttribute="leading" secondItem="LXF-Cy-pjR" secondAttribute="leading" constant="20" id="hVG-Js-QNJ"/>
+                            <constraint firstItem="PfK-jO-7LH" firstAttribute="centerY" secondItem="LXF-Cy-pjR" secondAttribute="centerY" id="hla-CK-vQg"/>
+                            <constraint firstItem="RKc-mr-aJK" firstAttribute="top" secondItem="PfK-jO-7LH" secondAttribute="bottom" constant="30" id="qZy-0m-G8X"/>
+                            <constraint firstAttribute="trailing" secondItem="85q-2P-LaD" secondAttribute="trailing" constant="20" id="vX0-Sg-HzD"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="endTextField" destination="Bvb-Ja-WUh" id="ab6-fB-Kj1"/>
+                        <outlet property="startTextField" destination="85q-2P-LaD" id="Z9J-uL-dKJ"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="M0w-YX-PGG" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1394" y="360"/>
         </scene>
         <!--Traffic Route View Controller-->
         <scene sceneID="WC7-Lg-NzC">

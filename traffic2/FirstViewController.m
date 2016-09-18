@@ -56,6 +56,7 @@ NSString *destinationAddress;
 
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveDirectionNotification:) name:@"GetDirectionData" object:nil];
 }
 
 - (void) handleOverlayTap:(UIGestureRecognizer*)tap {
@@ -156,6 +157,9 @@ NSString *destinationAddress;
     addressDetailViewController.addressString = [view.annotation title];
     self.currentPoint = [view.annotation coordinate];
     addressDetailViewController.mainViewController = self;
+    [self convertlocationIntoString:self.currentPoint completionHandler:^(NSString *address){
+        addressDetailViewController.currentLocationString = address;
+    }];
     [self addChildViewController:addressDetailViewController];
     [self.view addSubview:addressDetailViewController.view];
 }
@@ -182,6 +186,9 @@ NSString *destinationAddress;
                 break;
         }
         polyRenderer.lineWidth = 5;
+    }else {
+        polyRenderer.strokeColor = [[UIColor greenColor] colorWithAlphaComponent:0.75];
+        polyRenderer.lineWidth = 5;
     }
     return polyRenderer;
 }
@@ -192,17 +199,61 @@ NSString *destinationAddress;
     [self downloadAccident:self.currentPoint];
 }
 
+- (void)receiveDirectionNotification:(NSNotification *)notif{
+    NSArray *pointsArray = [self.mapView overlays];
+    [self.mapView removeOverlays:pointsArray];
+    NSString *startString = notif.userInfo[@"start"];
+    NSString *endString = notif.userInfo[@"end"];
+    [self convertStringIntoLocation:startString completionHandler:^(MKPlacemark *startPlaceMark){
+        MKMapItem *startItem = [[MKMapItem alloc]initWithPlacemark:startPlaceMark];
+        [self convertStringIntoLocation:endString completionHandler:^(MKPlacemark *endPlaceMark){
+            MKMapItem *endItem = [[MKMapItem alloc]initWithPlacemark:endPlaceMark];
+            MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+            request.source = startItem;
+            request.destination = endItem;
+            request.requestsAlternateRoutes = true;
+            request.transportType = MKDirectionsTransportTypeAutomobile;
+            
+            MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
+            [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
+                if (!err) {
+                    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:YES];
+                    NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
+                    
+                    for(MKRouteStep *route in sortedArray){
+                        [self.mapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
+                        if (self.mapView.overlays.count == 1) {
+                            [self.mapView setVisibleMapRect:route.polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
+                        }else{
+                            MKMapRect newRouteBound = MKMapRectUnion(self.mapView.visibleMapRect, route.polyline.boundingMapRect);
+                            [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
+                        }
+                    }
+                }
+            }];
+        }];
+    }];
+}
+
 - (IBAction)searchMethod:(id)sender {
-    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
-    
-    [geocoder geocodeAddressString:self.searchText.text completionHandler:^(NSArray* placemarks, NSError* error){
-        for (CLPlacemark *placeMark in placemarks){
-            MKPlacemark *realPlaceMark = [[MKPlacemark alloc]initWithPlacemark:placeMark];
-            [self.mapView addAnnotation:realPlaceMark];
-        
-            MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(realPlaceMark.coordinate, 800, 800);
+    [self convertStringIntoLocation:self.searchText.text completionHandler:^(MKPlacemark *placeMark){
+        if (placeMark) {
+            [self.mapView addAnnotation:placeMark];
+            MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(placeMark.coordinate, 800, 800);
             [self.mapView setRegion:[self.mapView regionThatFits:region] animated:YES];
         }
+    }];
+}
+
+- (void)convertStringIntoLocation:(NSString *)string completionHandler:(void(^)(MKPlacemark *))completionBlock{
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
+    [geocoder geocodeAddressString:string completionHandler:^(NSArray* placemarks, NSError* error){
+        for (CLPlacemark *placeMark in placemarks){
+            MKPlacemark *realPlaceMark = [[MKPlacemark alloc]initWithPlacemark:placeMark];
+            completionBlock(realPlaceMark);
+        }
+        completionBlock(nil);
     }];
 }
 
