@@ -17,7 +17,7 @@
 @end
 
 
-const NSString *bingMapKey = @"AsHdhDvy5ci5JminQIzQLu3Wgl6pLToeZ-vkDoLkc_SHD2KferVhJ_v_VEz8jSfd";
+const NSString *bingMapKey = @"ArlTvq-7ghxO_UPCB12CJ73UldCOmuA5DQF9C7ryWi1rmRlhQYhgBKOncFa4iXz2";
 NSLock *allPointSetLock;
 const NSString *TapPoint = @"TapPoint";
 const NSString *SearchPoint = @"SearchPoint";
@@ -97,6 +97,7 @@ NSString *destinationAddress;
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(locations.firstObject.coordinate, 800, 800);
+    self.currentPoint = locations.firstObject.coordinate;
     [self.mapView setRegion:[self.mapView regionThatFits:region] animated:YES];
 }
 
@@ -155,7 +156,7 @@ NSString *destinationAddress;
     AddressDetailViewController *addressDetailViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddressDetailViewController"];
     addressDetailViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     addressDetailViewController.addressString = [view.annotation title];
-    self.currentPoint = [view.annotation coordinate];
+    addressDetailViewController.addressPoint = [view.annotation coordinate];
     addressDetailViewController.mainViewController = self;
     [self convertlocationIntoString:self.currentPoint completionHandler:^(NSString *address){
         addressDetailViewController.currentLocationString = address;
@@ -194,9 +195,10 @@ NSString *destinationAddress;
 }
 
 - (void)receiveTrafficNotification:(NSNotification *)notif {
+    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.userInfo[@"longtitue"] doubleValue]);
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
-    [self downloadAccident:self.currentPoint];
+    [self downloadAccident:currentP];
 }
 
 - (void)receiveDirectionNotification:(NSNotification *)notif{
@@ -217,10 +219,16 @@ NSString *destinationAddress;
             MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
             [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
                 if (!err) {
-                    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:YES];
+                    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:NO];
                     NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
-                    
                     for(MKRouteStep *route in sortedArray){
+                        
+                        CLLocationCoordinate2D *routeCoord = malloc(route.polyline.pointCount*sizeof(CLLocationCoordinate2D));
+                        [route.polyline getCoordinates:routeCoord range:NSMakeRange(0, route.polyline.pointCount)];
+                        [self downloadRouteTraffic:routeCoord[0] destination:routeCoord[route.polyline.pointCount-1] completionHandler:^(int travelTime, int trafficTravelTime, NSArray *allReturnPoints){
+                            int i = 0;
+                        }];
+                        
                         [self.mapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
                         if (self.mapView.overlays.count == 1) {
                             [self.mapView setVisibleMapRect:route.polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
@@ -366,6 +374,31 @@ NSString *destinationAddress;
         [pointsSet addObject:newPointValue];
         return false;
     }
+}
+
+- (void)downloadRouteTraffic:(CLLocationCoordinate2D)source destination:(CLLocationCoordinate2D)destination completionHandler:(void(^)(int,int,NSArray*))completionBlock {
+    NSString *url = [NSString stringWithFormat:@"http://dev.virtualearth.net/REST/v1/Routes/Driving?wp.1=%f,%f&wp.2=%f,%f&ra=routePath&key=%@",(float)source.latitude, (float)source.longitude, (float)destination.latitude, (float)destination.longitude, bingMapKey];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
+    [request setHTTPMethod:@"GET"];
+    
+    NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if(error) {
+            NSLog(@"Error: %@", error);
+        }else {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            NSError *err;
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            
+            if ([httpResponse statusCode] == 200){
+                NSDictionary *routeInfo = [[[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject] firstObject];
+                int travelTime = [routeInfo[@"travelDuration"] intValue]/60;
+                int trafficTravelTime = [routeInfo[@"travelDurationTraffic"]intValue]/60;
+                NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
+                completionBlock(travelTime, trafficTravelTime, allPoints);
+            }
+        }
+    }];
+    [task resume];
 }
 
 - (void)downloadAccident:(CLLocationCoordinate2D )address{

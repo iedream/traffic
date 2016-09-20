@@ -16,6 +16,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self setTextFieldProperties:self.startTextField];
+    [self setTextFieldProperties:self.endTextField];
     [self.startTextField setText:self.currentLocationAddress];
     [self.endTextField setText:self.endPointAddress];
     // Do any additional setup after loading the view.
@@ -40,6 +42,11 @@
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetDirectionData" object:nil userInfo:directionData];
     [self removeFromParentViewController];
     [self.view removeFromSuperview];
+}
+
+-(void)setTextFieldProperties:(UITextField*)textField {
+    [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+    [textField setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
 }
 
 /*

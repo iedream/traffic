@@ -13,6 +13,7 @@
 @interface AddressDetailViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 
+@property (nonatomic, assign) CLLocationCoordinate2D addressPoint;
 @property (nonatomic, strong) NSString *addressString;
 @property (nonatomic, strong) NSString *currentLocationString;
 @property (nonatomic, retain) FirstViewController *mainViewController;

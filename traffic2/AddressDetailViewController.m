@@ -26,7 +26,11 @@
     // Dispose of any resources that can be recreated.
 }
 - (IBAction)getTrafficData:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:nil];
+    NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:
+                            [NSNumber numberWithDouble:self.addressPoint.latitude], @"latitude",
+                            [NSNumber numberWithDouble:self.addressPoint.longitude], @"longitude",
+                            nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:params];
     [self removeFromParentViewController];
     [self.view removeFromSuperview];
 }
