@@ -60,36 +60,60 @@ NSString *destinationAddress;
 }
 
 - (void) handleOverlayTap:(UIGestureRecognizer*)tap {
+    NSArray *subviews = [self.mapView.subviews copy];
+    for(int i = 0; i < subviews.count; i++){
+        if ([subviews[i] isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel*)subviews[i];
+            [label removeFromSuperview];
+        }
+    }
+    
     CGPoint tapPoint = [tap locationInView:self.mapView];
     CLLocationCoordinate2D tapCoord = [self.mapView convertPoint:tapPoint toCoordinateFromView:self.mapView];
     MKMapPoint tapMapPoint = MKMapPointForCoordinate(tapCoord);
     MKMapRect tapRegion = MKMapRectMake(tapMapPoint.x, tapMapPoint.y, 1, 0.00005);
     for (id<MKOverlay> overlay in self.mapView.overlays) {
-        MyPolyLine *polygon = (MyPolyLine*)overlay;
-        MKMapRect newRegion = [polygon boundingMapRect];
-        if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
-            TrafficRouteViewController *trafficRouteViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TrafficRouteViewController"];
-            [self convertlocationIntoString:polygon.source completionHandler:^(NSString *address) {
-                sourceAddress = address;
-                [self convertlocationIntoString:polygon.destination completionHandler:^(NSString *address) {
-                    destinationAddress = address;
-                    NSDictionary *trafficDic = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                                [NSNumber numberWithInt:polygon.severity], @"severity",
-                                                [NSNumber numberWithInt:polygon.type], @"type",
-                                                [NSNumber numberWithBool:polygon.roadClosed], @"roadClosed",
-                                                polygon.startTime, @"startTime",
-                                                polygon.endTime, @"endTime",
-                                                sourceAddress, @"source",
-                                                destinationAddress, @"destination",
-                                                polygon.info, @"description",
-                                                polygon.detour, @"detour",
-                                                polygon.lane, @"lane",
-                                                polygon.congestion, @"congestion", nil];
-                    trafficRouteViewController.infoDic = trafficDic;
-                    [self addChildViewController:trafficRouteViewController];
-                    [self.view addSubview:trafficRouteViewController.view];
+        if ([overlay isKindOfClass:[MyPolyLine class]]) {
+            MyPolyLine *polygon = (MyPolyLine*)overlay;
+            MKMapRect newRegion = [polygon boundingMapRect];
+            if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
+                TrafficRouteViewController *trafficRouteViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TrafficRouteViewController"];
+                [self convertlocationIntoString:polygon.source completionHandler:^(NSString *address) {
+                    sourceAddress = address;
+                    [self convertlocationIntoString:polygon.destination completionHandler:^(NSString *address) {
+                        destinationAddress = address;
+                        NSDictionary *trafficDic = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                                    [NSNumber numberWithInt:polygon.severity], @"severity",
+                                                    [NSNumber numberWithInt:polygon.type], @"type",
+                                                    [NSNumber numberWithBool:polygon.roadClosed], @"roadClosed",
+                                                    polygon.startTime, @"startTime",
+                                                    polygon.endTime, @"endTime",
+                                                    sourceAddress, @"source",
+                                                    destinationAddress, @"destination",
+                                                    polygon.info, @"description",
+                                                    polygon.detour, @"detour",
+                                                    polygon.lane, @"lane",
+                                                    polygon.congestion, @"congestion", nil];
+                        trafficRouteViewController.infoDic = trafficDic;
+                        [self addChildViewController:trafficRouteViewController];
+                        [self.view addSubview:trafficRouteViewController.view];
+                    }];
                 }];
-            }];
+            }
+        }else if ([overlay isKindOfClass:[MKPolyline class]]){
+            MKPolyline *pointOverlay = (MKPolyline*)overlay;
+            MKMapRect newRegion = [overlay boundingMapRect];
+            if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50){
+                MKMapPoint middlePoint = pointOverlay.points[pointOverlay.pointCount/2];
+                CLLocationCoordinate2D middleCoor = MKCoordinateForMapPoint(middlePoint);
+                CGPoint actualPoint = [self.mapView convertCoordinate:middleCoor toPointToView:self.mapView];
+                UILabel *timeLabel = [[UILabel alloc]initWithFrame:CGRectMake(actualPoint.x-20, actualPoint.y-10, 40, 20)];
+                [timeLabel setBackgroundColor:[UIColor lightGrayColor]];
+                [timeLabel setAlpha:0.4];
+                [timeLabel setText:pointOverlay.title];
+                timeLabel.adjustsFontSizeToFitWidth = YES;
+                [self.mapView addSubview:timeLabel];
+            }
         }
     }
 }
@@ -152,11 +176,22 @@ NSString *destinationAddress;
     return annotationView;
 }
 
+- (UIImage *)imageFromColor:(UIColor *)color {
+    CGRect rect = CGRectMake(0, 0, 1, 1);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control{
     AddressDetailViewController *addressDetailViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddressDetailViewController"];
     addressDetailViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
     addressDetailViewController.addressString = [view.annotation title];
-    addressDetailViewController.addressPoint = [view.annotation coordinate];
+    addressDetailViewController.addressPoint = view.annotation.coordinate;
     addressDetailViewController.mainViewController = self;
     [self convertlocationIntoString:self.currentPoint completionHandler:^(NSString *address){
         addressDetailViewController.currentLocationString = address;
@@ -195,52 +230,100 @@ NSString *destinationAddress;
 }
 
 - (void)receiveTrafficNotification:(NSNotification *)notif {
-    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.userInfo[@"longtitue"] doubleValue]);
+    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.object[@"latitude"] doubleValue], [notif.object[@"longitude"] doubleValue]);
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:currentP];
 }
 
+- (void)plotOverlayOnMap:(MKPolyline*)polyline {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^(void){
+        [self.mapView addOverlay:polyline];
+        //[self.mapView addOverlay:polyline level:MKOverlayLevelAboveRoads];
+        [self.mapView setNeedsDisplay];
+        if (self.mapView.overlays.count == 1) {
+            [self.mapView setVisibleMapRect:polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
+        }else{
+            MKMapRect newRouteBound = MKMapRectUnion(self.mapView.visibleMapRect, polyline.boundingMapRect);
+            [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
+        }
+    }];
+}
+
+- (void)directionWithAppleMap:(MKPlacemark *)startPlaceMark endPlaceMark:(MKPlacemark *)endPlaceMark {
+    MKMapItem *startItem = [[MKMapItem alloc]initWithPlacemark:startPlaceMark];
+    MKMapItem *endItem = [[MKMapItem alloc]initWithPlacemark:endPlaceMark];
+    MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+    request.source = startItem;
+    request.destination = endItem;
+    request.requestsAlternateRoutes = true;
+    request.transportType = MKDirectionsTransportTypeAutomobile;
+            
+    MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
+        if (!err) {
+            for(MKRoute *route in response.routes) {
+                int time = route.expectedTravelTime/60;
+                [route.polyline setTitle:[NSString stringWithFormat:@"%imin",time]];
+                [self plotOverlayOnMap:route.polyline];
+            }
+        };
+    }];
+}
+
+- (void)directionWithBingMap:(MKPlacemark *)startPlaceMark endPlaceMark:(MKPlacemark *)endPlaceMark {
+    NSString *url = [NSString stringWithFormat:@"http://dev.virtualearth.net/REST/v1/Routes/Driving?wp.1=%f,%f&wp.2=%f,%f&ra=routePath&maxSolns=2&key=%@",(float)startPlaceMark.coordinate.latitude, (float)startPlaceMark.coordinate.longitude, (float)endPlaceMark.coordinate.latitude, (float)endPlaceMark.coordinate.longitude, bingMapKey];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
+    [request setHTTPMethod:@"GET"];
+    
+    NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if(error) {
+            NSLog(@"Error: %@", error);
+        }else {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            NSError *err;
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            
+            if ([httpResponse statusCode] == 200){
+                NSDictionary *routeInfo = [[[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject] firstObject];
+                int travelTime = [routeInfo[@"travelDuration"] intValue]/60;
+                int trafficTravelTime = [routeInfo[@"travelDurationTraffic"]intValue]/60;
+                NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
+                
+                NSUInteger length = allPoints.count;
+                MKMapPoint pathRouteArray[32];
+                for (int i = 0; i < length; i++) {
+                    NSArray *currentPoint = allPoints[i];
+                    CLLocationCoordinate2D currentCoord = CLLocationCoordinate2DMake([currentPoint[0] floatValue], [currentPoint[1] floatValue]);
+                    MKMapPoint mapPoint = MKMapPointForCoordinate(currentCoord);
+                    pathRouteArray[i] = mapPoint;
+                }
+                MKPolyline *polyLine = [MKPolyline polylineWithPoints:pathRouteArray count:length];
+                polyLine.title = @"HELLO";
+                [self plotOverlayOnMap:polyLine];
+            }
+        }
+    }];
+    [task resume];
+
+}
+
 - (void)receiveDirectionNotification:(NSNotification *)notif{
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
+    
     NSString *startString = notif.userInfo[@"start"];
     NSString *endString = notif.userInfo[@"end"];
+    
     [self convertStringIntoLocation:startString completionHandler:^(MKPlacemark *startPlaceMark){
-        MKMapItem *startItem = [[MKMapItem alloc]initWithPlacemark:startPlaceMark];
         [self convertStringIntoLocation:endString completionHandler:^(MKPlacemark *endPlaceMark){
-            MKMapItem *endItem = [[MKMapItem alloc]initWithPlacemark:endPlaceMark];
-            MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
-            request.source = startItem;
-            request.destination = endItem;
-            request.requestsAlternateRoutes = true;
-            request.transportType = MKDirectionsTransportTypeAutomobile;
-            
-            MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
-            [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
-                if (!err) {
-                    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:NO];
-                    NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
-                    for(MKRouteStep *route in sortedArray){
-                        
-                        CLLocationCoordinate2D *routeCoord = malloc(route.polyline.pointCount*sizeof(CLLocationCoordinate2D));
-                        [route.polyline getCoordinates:routeCoord range:NSMakeRange(0, route.polyline.pointCount)];
-                        [self downloadRouteTraffic:routeCoord[0] destination:routeCoord[route.polyline.pointCount-1] completionHandler:^(int travelTime, int trafficTravelTime, NSArray *allReturnPoints){
-                            int i = 0;
-                        }];
-                        
-                        [self.mapView addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
-                        if (self.mapView.overlays.count == 1) {
-                            [self.mapView setVisibleMapRect:route.polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
-                        }else{
-                            MKMapRect newRouteBound = MKMapRectUnion(self.mapView.visibleMapRect, route.polyline.boundingMapRect);
-                            [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
-                        }
-                    }
-                }
-            }];
+            [self directionWithAppleMap:startPlaceMark endPlaceMark:endPlaceMark];
+            //[self directionWithBingMap:startPlaceMark endPlaceMark:endPlaceMark];
         }];
     }];
+
+    
+    //[self directionWithAppleMap:startString endString:endString];
 }
 
 - (IBAction)searchMethod:(id)sender {
@@ -355,15 +438,7 @@ NSString *destinationAddress;
     trafficLane.info = [incidentDic objectForKey:@"description"];
     trafficLane.lane = [incidentDic objectForKey:@"lane"];
     
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^(void){
-        [self.mapView addOverlay:trafficLane];
-        if (self.mapView.overlays.count == 1) {
-            [self.mapView setVisibleMapRect:trafficLane.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
-        }else{
-            MKMapRect newRouteBound = MKMapRectUnion(self.mapView.visibleMapRect, trafficLane.boundingMapRect);
-            [self.mapView setVisibleMapRect:newRouteBound edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
-        }
-    }];
+    [self plotOverlayOnMap:trafficLane];
 }
 
 - (BOOL)pointExistAlready:(NSMutableSet*)pointsSet coordinate:(CLLocationCoordinate2D)newPoint{
@@ -424,6 +499,56 @@ NSString *destinationAddress;
     [task resume];
 }
 
+
+- (double)distanceOfPoint:(MKMapPoint)pt toPoly:(MKPolyline *)poly
+{
+    double distance = MAXFLOAT;
+    for (int n = 0; n < poly.pointCount - 1; n++) {
+        
+        MKMapPoint ptA = poly.points[n];
+        MKMapPoint ptB = poly.points[n + 1];
+        
+        double xDelta = ptB.x - ptA.x;
+        double yDelta = ptB.y - ptA.y;
+        
+        if (xDelta == 0.0 && yDelta == 0.0) {
+            
+            // Points must not be equal
+            continue;
+        }
+        
+        double u = ((pt.x - ptA.x) * xDelta + (pt.y - ptA.y) * yDelta) / (xDelta * xDelta + yDelta * yDelta);
+        MKMapPoint ptClosest;
+        if (u < 0.0) {
+            
+            ptClosest = ptA;
+        }
+        else if (u > 1.0) {
+            
+            ptClosest = ptB;
+        }
+        else {
+            
+            ptClosest = MKMapPointMake(ptA.x + u * xDelta, ptA.y + u * yDelta);
+        }
+        
+        distance = MIN(distance, MKMetersBetweenMapPoints(ptClosest, pt));
+    }
+    
+    return distance;
+}
+
+
+/** Converts |px| to meters at location |pt| */
+- (double)metersFromPixel:(NSUInteger)px atPoint:(CGPoint)pt
+{
+    CGPoint ptB = CGPointMake(pt.x + px, pt.y);
+    
+    CLLocationCoordinate2D coordA = [self.mapView convertPoint:pt toCoordinateFromView:self.mapView];
+    CLLocationCoordinate2D coordB = [self.mapView convertPoint:ptB toCoordinateFromView:self.mapView];
+    
+    return MKMetersBetweenMapPoints(MKMapPointForCoordinate(coordA), MKMapPointForCoordinate(coordB));
+}
 
 
 -(void)traffic {
