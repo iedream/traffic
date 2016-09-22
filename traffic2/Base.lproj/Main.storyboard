@@ -177,7 +177,7 @@
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PfK-jO-7LH">
-                                <rect key="frame" x="245" y="310" width="111" height="30"/>
+                                <rect key="frame" x="245" y="346" width="111" height="30"/>
                                 <state key="normal" title="Get Direction"/>
                                 <connections>
                                     <action selector="getDirection:" destination="9bY-f4-AXo" eventType="touchUpInside" id="BGL-Gl-k32"/>
@@ -191,9 +191,19 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RKc-mr-aJK">
-                                <rect key="frame" x="277" y="362" width="46" height="30"/>
+                                <rect key="frame" x="277" y="409" width="46" height="30"/>
                                 <state key="normal" title="Back"/>
                             </button>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="vZz-8l-t0c">
+                                <rect key="frame" x="220" y="286" width="160" height="29"/>
+                                <segments>
+                                    <segment title="Apple Map"/>
+                                    <segment title="Bing Map"/>
+                                </segments>
+                                <connections>
+                                    <action selector="mapTypeChanged:" destination="9bY-f4-AXo" eventType="valueChanged" id="uzg-qd-C60"/>
+                                </connections>
+                            </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -207,16 +217,19 @@
                             <constraint firstItem="PfK-jO-7LH" firstAttribute="centerX" secondItem="LXF-Cy-pjR" secondAttribute="centerX" id="QeK-i6-tVc"/>
                             <constraint firstItem="Bvb-Ja-WUh" firstAttribute="leading" secondItem="85q-2P-LaD" secondAttribute="leading" id="V5d-Wv-yIQ"/>
                             <constraint firstItem="85q-2P-LaD" firstAttribute="centerY" secondItem="pHO-5V-f3O" secondAttribute="centerY" id="X96-fd-Z2z"/>
-                            <constraint firstItem="PfK-jO-7LH" firstAttribute="top" secondItem="J3S-5S-6B5" secondAttribute="bottom" constant="30" id="XLa-ck-CCx"/>
+                            <constraint firstItem="vZz-8l-t0c" firstAttribute="centerX" secondItem="LXF-Cy-pjR" secondAttribute="centerX" id="dnj-Hc-zSZ"/>
+                            <constraint firstItem="PfK-jO-7LH" firstAttribute="top" secondItem="vZz-8l-t0c" secondAttribute="bottom" constant="30" id="fuf-fO-MQ8"/>
                             <constraint firstItem="J3S-5S-6B5" firstAttribute="top" secondItem="Ru1-Qs-nfc" secondAttribute="bottom" constant="30" id="gkq-Th-AJh"/>
                             <constraint firstItem="pHO-5V-f3O" firstAttribute="leading" secondItem="LXF-Cy-pjR" secondAttribute="leading" constant="20" id="hVG-Js-QNJ"/>
                             <constraint firstItem="PfK-jO-7LH" firstAttribute="centerY" secondItem="LXF-Cy-pjR" secondAttribute="centerY" id="hla-CK-vQg"/>
                             <constraint firstItem="RKc-mr-aJK" firstAttribute="top" secondItem="PfK-jO-7LH" secondAttribute="bottom" constant="30" id="qZy-0m-G8X"/>
+                            <constraint firstItem="vZz-8l-t0c" firstAttribute="top" secondItem="J3S-5S-6B5" secondAttribute="bottom" constant="30" id="tW0-Jp-FFx"/>
                             <constraint firstAttribute="trailing" secondItem="85q-2P-LaD" secondAttribute="trailing" constant="20" id="vX0-Sg-HzD"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="endTextField" destination="Bvb-Ja-WUh" id="ab6-fB-Kj1"/>
+                        <outlet property="mapTypeSegment" destination="vZz-8l-t0c" id="rFm-1W-bEe"/>
                         <outlet property="startTextField" destination="85q-2P-LaD" id="Z9J-uL-dKJ"/>
                     </connections>
                 </viewController>
@@ -235,20 +248,6 @@
                     <view key="view" contentMode="scaleToFill" id="qhV-km-LyA">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Start" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aug-3Q-gre">
-                                <rect key="frame" x="279" y="28" width="42" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="End" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9OY-Lf-A8O">
-                                <rect key="frame" x="279" y="103" width="42" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                 </viewController>

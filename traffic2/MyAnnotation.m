@@ -11,3 +11,7 @@
 @implementation MyPolyLine
 
 @end
+
+@implementation BingPolyLine
+
+@end

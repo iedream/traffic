@@ -38,6 +38,7 @@
     NSDictionary *directionData = [[NSDictionary alloc] initWithObjectsAndKeys:
                                    self.startTextField.text, @"start",
                                    self.endTextField.text, @"end",
+                                   [NSNumber numberWithInteger:self.mapTypeSegment.selectedSegmentIndex], @"mapType",
                                    nil];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetDirectionData" object:nil userInfo:directionData];
     [self removeFromParentViewController];
@@ -47,6 +48,9 @@
 -(void)setTextFieldProperties:(UITextField*)textField {
     [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     [textField setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+}
+
+- (IBAction)mapTypeChanged:(id)sender {
 }
 
 /*

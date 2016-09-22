@@ -27,6 +27,9 @@ NSOperationQueue *queue;
 NSString *sourceAddress;
 NSString *destinationAddress;
 
+UITapGestureRecognizer *labelTap;
+NSMutableDictionary *labelDic;
+
 @implementation FirstViewController
 
 - (void)viewDidLoad {
@@ -53,10 +56,23 @@ NSString *destinationAddress;
     UITapGestureRecognizer *overlayTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleOverlayTap:)];
     [overlayTap setDelegate:self];
     [self.mapView addGestureRecognizer:overlayTap];
+    
+    labelTap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(handleLabelTap:)];
+    [labelTap setDelegate:self];
+    labelDic = [[NSMutableDictionary alloc]init];
 
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveDirectionNotification:) name:@"GetDirectionData" object:nil];
+    
+}
+
+- (void) handleLabelTap:(UIGestureRecognizer *)tap {
+    if ([tap.view isKindOfClass:[UILabel class]]) {
+        UILabel *label = (UILabel *)tap.view;
+        BingPolyLine *polyline = (BingPolyLine *)labelDic[label.accessibilityIdentifier];
+        [label removeGestureRecognizer:labelTap];
+    }
 }
 
 - (void) handleOverlayTap:(UIGestureRecognizer*)tap {
@@ -71,12 +87,10 @@ NSString *destinationAddress;
     CGPoint tapPoint = [tap locationInView:self.mapView];
     CLLocationCoordinate2D tapCoord = [self.mapView convertPoint:tapPoint toCoordinateFromView:self.mapView];
     MKMapPoint tapMapPoint = MKMapPointForCoordinate(tapCoord);
-    MKMapRect tapRegion = MKMapRectMake(tapMapPoint.x, tapMapPoint.y, 1, 0.00005);
     for (id<MKOverlay> overlay in self.mapView.overlays) {
         if ([overlay isKindOfClass:[MyPolyLine class]]) {
             MyPolyLine *polygon = (MyPolyLine*)overlay;
-            MKMapRect newRegion = [polygon boundingMapRect];
-            if (MKMapRectIntersectsRect(newRegion, tapRegion)) {
+            if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50) {
                 TrafficRouteViewController *trafficRouteViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"TrafficRouteViewController"];
                 [self convertlocationIntoString:polygon.source completionHandler:^(NSString *address) {
                     sourceAddress = address;
@@ -100,9 +114,32 @@ NSString *destinationAddress;
                     }];
                 }];
             }
-        }else if ([overlay isKindOfClass:[MKPolyline class]]){
+        } else if ([overlay isKindOfClass:[BingPolyLine class]]) {
+            BingPolyLine *pointOverlay = (BingPolyLine*)overlay;
+            if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50){
+                MKMapPoint middlePoint = pointOverlay.points[pointOverlay.pointCount/2];
+                CLLocationCoordinate2D middleCoor = MKCoordinateForMapPoint(middlePoint);
+                CGPoint actualPoint = [self.mapView convertCoordinate:middleCoor toPointToView:self.mapView];
+                UILabel *timeLabel = [[UILabel alloc]initWithFrame:CGRectMake(actualPoint.x-20, actualPoint.y-10, 40, 20)];
+                [timeLabel setBackgroundColor:[UIColor lightGrayColor]];
+                
+                NSString *key = [NSString stringWithFormat:@"%i", arc4random_uniform(100000)];
+                while (labelDic[key]) {
+                    key = [NSString stringWithFormat:@"%i", arc4random_uniform(100000)];
+                }
+                labelDic[key] = pointOverlay;
+                [timeLabel setAccessibilityIdentifier:key];
+                
+                [timeLabel setAlpha:0.4];
+                [timeLabel setText: [NSString stringWithFormat:@"%imin", pointOverlay.trafficTravelTime]];
+                timeLabel.adjustsFontSizeToFitWidth = YES;
+                [timeLabel setUserInteractionEnabled:YES];
+                [timeLabel addGestureRecognizer:labelTap];
+                [self.mapView addSubview:timeLabel];
+
+            }
+        } else if ([overlay isKindOfClass:[MKPolyline class]]) {
             MKPolyline *pointOverlay = (MKPolyline*)overlay;
-            MKMapRect newRegion = [overlay boundingMapRect];
             if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50){
                 MKMapPoint middlePoint = pointOverlay.points[pointOverlay.pointCount/2];
                 CLLocationCoordinate2D middleCoor = MKCoordinateForMapPoint(middlePoint);
@@ -112,6 +149,7 @@ NSString *destinationAddress;
                 [timeLabel setAlpha:0.4];
                 [timeLabel setText:pointOverlay.title];
                 timeLabel.adjustsFontSizeToFitWidth = YES;
+                [timeLabel addGestureRecognizer:labelTap];
                 [self.mapView addSubview:timeLabel];
             }
         }
@@ -221,12 +259,31 @@ NSString *destinationAddress;
                 polyRenderer.strokeColor = [[UIColor purpleColor] colorWithAlphaComponent:0.75];
                 break;
         }
-        polyRenderer.lineWidth = 5;
     }else {
-        polyRenderer.strokeColor = [[UIColor greenColor] colorWithAlphaComponent:0.75];
-        polyRenderer.lineWidth = 5;
+        int count = [self countRouteCount];
+        if (count == 1) {
+            polyRenderer.strokeColor = [[UIColor greenColor] colorWithAlphaComponent:0.75];
+        }else if (count == 2) {
+            polyRenderer.strokeColor = [[UIColor purpleColor] colorWithAlphaComponent:0.75];
+        }else if (count == 3) {
+            polyRenderer.strokeColor = [[UIColor whiteColor] colorWithAlphaComponent:0.75];
+        }else if (count == 4) {
+            polyRenderer.strokeColor = [[UIColor grayColor] colorWithAlphaComponent:0.75];
+        }
     }
+    polyRenderer.lineWidth = 5;
     return polyRenderer;
+}
+
+- (int)countRouteCount {
+    NSArray *overlays = self.mapView.overlays;
+    int count = 0;
+    for (int i = 0; i < overlays.count; i++) {
+        if (![overlays[i] isKindOfClass:[MyPolyLine class]]) {
+            count++;
+        }
+    }
+    return count;
 }
 
 - (void)receiveTrafficNotification:(NSNotification *)notif {
@@ -286,10 +343,8 @@ NSString *destinationAddress;
             
             if ([httpResponse statusCode] == 200){
                 NSDictionary *routeInfo = [[[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject] firstObject];
-                int travelTime = [routeInfo[@"travelDuration"] intValue]/60;
-                int trafficTravelTime = [routeInfo[@"travelDurationTraffic"]intValue]/60;
-                NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
                 
+                NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
                 NSUInteger length = allPoints.count;
                 MKMapPoint pathRouteArray[32];
                 for (int i = 0; i < length; i++) {
@@ -298,8 +353,31 @@ NSString *destinationAddress;
                     MKMapPoint mapPoint = MKMapPointForCoordinate(currentCoord);
                     pathRouteArray[i] = mapPoint;
                 }
-                MKPolyline *polyLine = [MKPolyline polylineWithPoints:pathRouteArray count:length];
-                polyLine.title = @"HELLO";
+                BingPolyLine *polyLine = [BingPolyLine polylineWithPoints:pathRouteArray count:length];
+                
+                NSMutableArray *directionDataSource = [[NSMutableArray alloc]init];
+                NSArray *routeLegs = [routeInfo objectForKey:@"routeLegs"];
+                for (NSDictionary *routeLegDic in routeLegs) {
+                    NSDictionary *subRouteDic = [routeLegDic objectForKey:@"itineraryItems"];
+                    for (NSDictionary *directionDic in subRouteDic) {
+                        NSString *direction = [[directionDic objectForKey:@"instruction"] objectForKey:@"text"];
+                        [directionDataSource addObject:direction];
+                    }
+                }
+                polyLine.directionDataSource = [directionDataSource copy];
+                
+                if ([routeInfo[@"durationUnit"] isEqualToString:@"Second"]) {
+                    int travelTime = [routeInfo[@"travelDuration"] intValue]/60;
+                    int trafficTravelTime = [routeInfo[@"travelDurationTraffic"] intValue]/60;
+                    polyLine.travelTime = travelTime;
+                    polyLine.trafficTravelTime = trafficTravelTime;
+                }
+                
+                if ([routeInfo[@"distanceUnit"] isEqualToString:@"Kilometer"]) {
+                    polyLine.distance = [routeInfo[@"travelDistance"] intValue];
+                }
+                polyLine.congestion = routeInfo[@"trafficCongestion"];
+                
                 [self plotOverlayOnMap:polyLine];
             }
         }
@@ -317,8 +395,11 @@ NSString *destinationAddress;
     
     [self convertStringIntoLocation:startString completionHandler:^(MKPlacemark *startPlaceMark){
         [self convertStringIntoLocation:endString completionHandler:^(MKPlacemark *endPlaceMark){
-            [self directionWithAppleMap:startPlaceMark endPlaceMark:endPlaceMark];
-            //[self directionWithBingMap:startPlaceMark endPlaceMark:endPlaceMark];
+            if ([notif.userInfo[@"mapType"] integerValue] == APPLE_MAP) {
+                [self directionWithAppleMap:startPlaceMark endPlaceMark:endPlaceMark];
+            }else {
+                [self directionWithBingMap:startPlaceMark endPlaceMark:endPlaceMark];
+            }
         }];
     }];
 

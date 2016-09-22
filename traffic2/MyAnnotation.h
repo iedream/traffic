@@ -50,3 +50,13 @@ typedef enum {
 @property (nonatomic, retain, nullable) NSString *detour;
 
 @end
+
+@interface BingPolyLine : MKPolyline
+
+@property (nonatomic, assign) int travelTime;
+@property (nonatomic, assign) int trafficTravelTime;
+@property (nonatomic, assign) int distance;
+@property (nonatomic, retain, nonnull) NSString *congestion;
+@property (nonatomic, retain, nonnull) NSArray *directionDataSource;
+
+@end

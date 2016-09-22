@@ -8,10 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+typedef enum {
+    APPLE_MAP,
+    BING_MAP,
+} MapType;
+
 @interface GetTrafficViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UITextField *startTextField;
 @property (weak, nonatomic) IBOutlet UITextField *endTextField;
 @property (strong, nonatomic) NSString *currentLocationAddress;
 @property (strong, nonatomic) NSString *endPointAddress;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *mapTypeSegment;
+
 
 @end
