@@ -7,6 +7,7 @@
 //
 #import "FirstViewController.h"
 #import "AddressDetailViewController.h"
+#import "DirectionViewController.h"
 
 
 @interface FirstViewController ()
@@ -70,8 +71,25 @@ NSMutableDictionary *labelDic;
 - (void) handleLabelTap:(UIGestureRecognizer *)tap {
     if ([tap.view isKindOfClass:[UILabel class]]) {
         UILabel *label = (UILabel *)tap.view;
-        BingPolyLine *polyline = (BingPolyLine *)labelDic[label.accessibilityIdentifier];
-        [label removeGestureRecognizer:labelTap];
+        
+        if ([labelDic[label.accessibilityIdentifier] isKindOfClass:[BingPolyLine class]]) {
+            BingPolyLine *polyline = (BingPolyLine *)labelDic[label.accessibilityIdentifier];
+            [label removeGestureRecognizer:labelTap];
+            
+            DirectionViewController *directionViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"DirectionViewController"];
+            directionViewController.directionDataSource = polyline.directionDataSource;
+            [self addChildViewController:directionViewController];
+            [self.view addSubview:directionViewController.view];
+        }else if ([labelDic[label.accessibilityIdentifier] isKindOfClass:[ApplePolyLine class]]) {
+            ApplePolyLine *polyline = (ApplePolyLine *)labelDic[label.accessibilityIdentifier];
+            [label removeGestureRecognizer:labelTap];
+            
+            DirectionViewController *directionViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"DirectionViewController"];
+            directionViewController.directionDataSource = polyline.directionDataSource;
+            [self addChildViewController:directionViewController];
+            [self.view addSubview:directionViewController.view];
+        }
+        
     }
 }
 
@@ -138,17 +156,26 @@ NSMutableDictionary *labelDic;
                 [self.mapView addSubview:timeLabel];
 
             }
-        } else if ([overlay isKindOfClass:[MKPolyline class]]) {
+        } else if ([overlay isKindOfClass:[ApplePolyLine class]]) {
             MKPolyline *pointOverlay = (MKPolyline*)overlay;
             if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50){
                 MKMapPoint middlePoint = pointOverlay.points[pointOverlay.pointCount/2];
                 CLLocationCoordinate2D middleCoor = MKCoordinateForMapPoint(middlePoint);
                 CGPoint actualPoint = [self.mapView convertCoordinate:middleCoor toPointToView:self.mapView];
                 UILabel *timeLabel = [[UILabel alloc]initWithFrame:CGRectMake(actualPoint.x-20, actualPoint.y-10, 40, 20)];
+                
+                NSString *key = [NSString stringWithFormat:@"%i", arc4random_uniform(100000)];
+                while (labelDic[key]) {
+                    key = [NSString stringWithFormat:@"%i", arc4random_uniform(100000)];
+                }
+                labelDic[key] = pointOverlay;
+                [timeLabel setAccessibilityIdentifier:key];
+
                 [timeLabel setBackgroundColor:[UIColor lightGrayColor]];
                 [timeLabel setAlpha:0.4];
                 [timeLabel setText:pointOverlay.title];
                 timeLabel.adjustsFontSizeToFitWidth = YES;
+                [timeLabel setUserInteractionEnabled:YES];
                 [timeLabel addGestureRecognizer:labelTap];
                 [self.mapView addSubview:timeLabel];
             }
@@ -321,8 +348,22 @@ NSMutableDictionary *labelDic;
         if (!err) {
             for(MKRoute *route in response.routes) {
                 int time = route.expectedTravelTime/60;
-                [route.polyline setTitle:[NSString stringWithFormat:@"%imin",time]];
-                [self plotOverlayOnMap:route.polyline];
+                
+                CLLocationCoordinate2D *polyLineCoord = malloc(route.polyline.pointCount*sizeof(CLLocationCoordinate2D));
+                [route.polyline getCoordinates:polyLineCoord range:NSMakeRange(0, route.polyline.pointCount)];
+                ApplePolyLine *applePolyLine = [ApplePolyLine polylineWithCoordinates:polyLineCoord count:route.polyline.pointCount];
+                
+                [applePolyLine setTitle:[NSString stringWithFormat:@"%imin",time]];
+                
+                NSMutableArray *directionDataSource = [[NSMutableArray alloc]init];
+                for (MKRouteStep *routeStep in route.steps) {
+                    NSString *instruction = routeStep.instructions;
+                    NSArray *array = @[instruction, [NSNumber numberWithDouble:routeStep.distance]];
+                    [directionDataSource addObject:array];
+                }
+                applePolyLine.directionDataSource = directionDataSource;
+            
+                [self plotOverlayOnMap:applePolyLine];
             }
         };
     }];
@@ -361,7 +402,9 @@ NSMutableDictionary *labelDic;
                     NSDictionary *subRouteDic = [routeLegDic objectForKey:@"itineraryItems"];
                     for (NSDictionary *directionDic in subRouteDic) {
                         NSString *direction = [[directionDic objectForKey:@"instruction"] objectForKey:@"text"];
-                        [directionDataSource addObject:direction];
+                        int duration = [directionDic[@"travelDuration"] intValue];
+                        double distance = [directionDic[@"travelDistance"] doubleValue]*1000;
+                        [directionDataSource addObject:@[direction, [NSNumber numberWithDouble:distance], [NSNumber numberWithInt:duration]]];
                     }
                 }
                 polyLine.directionDataSource = [directionDataSource copy];

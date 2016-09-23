@@ -15,3 +15,7 @@
 @implementation BingPolyLine
 
 @end
+
+@implementation ApplePolyLine
+
+@end

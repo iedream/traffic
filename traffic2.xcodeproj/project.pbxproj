@@ -22,6 +22,7 @@
 		4FDB6C291D78EAF200B668EE /* traffic2UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C281D78EAF200B668EE /* traffic2UITests.m */; };
 		4FDB6C371D78EBBD00B668EE /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FDB6C361D78EBBD00B668EE /* MapKit.framework */; };
 		4FDB6C391D78F3C200B668EE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FDB6C381D78F3C200B668EE /* CoreLocation.framework */; };
+		4FE43A751D94CA5200D65073 /* DirectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FE43A741D94CA5200D65073 /* DirectionViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,8 @@
 		4FDB6C2A1D78EAF200B668EE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4FDB6C361D78EBBD00B668EE /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		4FDB6C381D78F3C200B668EE /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		4FE43A731D94CA5200D65073 /* DirectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectionViewController.h; sourceTree = "<group>"; };
+		4FE43A741D94CA5200D65073 /* DirectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DirectionViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,11 +135,14 @@
 				4FDB6C071D78EAF200B668EE /* FirstViewController.m */,
 				4FDB6C091D78EAF200B668EE /* SecondViewController.h */,
 				4FDB6C0A1D78EAF200B668EE /* SecondViewController.m */,
+				4FDB6C011D78EAF200B668EE /* main.m */,
 				4FDB6C0C1D78EAF200B668EE /* Main.storyboard */,
 				4FDB6C0F1D78EAF200B668EE /* Assets.xcassets */,
 				4FDB6C111D78EAF200B668EE /* LaunchScreen.storyboard */,
 				4FDB6C141D78EAF200B668EE /* Info.plist */,
 				4FDB6C001D78EAF200B668EE /* Supporting Files */,
+				4FE43A731D94CA5200D65073 /* DirectionViewController.h */,
+				4FE43A741D94CA5200D65073 /* DirectionViewController.m */,
 				4F9E428C1D80F1D70046B346 /* AddressDetailViewController.h */,
 				4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */,
 				4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */,
@@ -150,7 +156,6 @@
 		4FDB6C001D78EAF200B668EE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				4FDB6C011D78EAF200B668EE /* main.m */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -307,6 +312,7 @@
 				4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */,
 				4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */,
 				4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */,
+				4FE43A751D94CA5200D65073 /* DirectionViewController.m in Sources */,
 				4F756B641D86458D00C6DE47 /* MyAnnotation.m in Sources */,
 				4FDB6C081D78EAF200B668EE /* FirstViewController.m in Sources */,
 				4FDB6C021D78EAF200B668EE /* main.m in Sources */,

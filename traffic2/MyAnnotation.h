@@ -60,3 +60,9 @@ typedef enum {
 @property (nonatomic, retain, nonnull) NSArray *directionDataSource;
 
 @end
+
+@interface ApplePolyLine : MKPolyline
+
+@property (nonatomic, retain, nonnull) NSArray *directionDataSource;
+
+@end

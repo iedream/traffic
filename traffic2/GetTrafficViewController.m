@@ -50,9 +50,6 @@
     [textField setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
 }
 
-- (IBAction)mapTypeChanged:(id)sender {
-}
-
 /*
 #pragma mark - Navigation
 
