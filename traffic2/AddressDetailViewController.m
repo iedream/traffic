@@ -30,7 +30,7 @@
                             [NSNumber numberWithDouble:self.addressPoint.latitude], @"latitude",
                             [NSNumber numberWithDouble:self.addressPoint.longitude], @"longitude",
                             nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:params];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"GetTrafficData" object:nil userInfo:params];
     [self removeFromParentViewController];
     [self.view removeFromSuperview];
 }

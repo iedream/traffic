@@ -63,10 +63,14 @@ NSMutableDictionary *labelDic;
     labelDic = [[NSMutableDictionary alloc]init];
 
     self.navigationController.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveTrafficNotification:) name:@"GetTrafficData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivePointTrafficNotification:) name:@"GetTrafficData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveOnRouteTrafficNotification:) name:@"GetOnRouteTrafficData" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveAroundRouteTrafficNotification:) name:@"GetAroundRouteTrafficData" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveDirectionNotification:) name:@"GetDirectionData" object:nil];
     
 }
+
+#pragma mark GestureRecognizer Delegate Method
 
 - (void) handleLabelTap:(UIGestureRecognizer *)tap {
     if ([tap.view isKindOfClass:[UILabel class]]) {
@@ -78,6 +82,8 @@ NSMutableDictionary *labelDic;
             
             DirectionViewController *directionViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"DirectionViewController"];
             directionViewController.directionDataSource = polyline.directionDataSource;
+            directionViewController.polyLine = polyline;
+            directionViewController.mapType = BING_MAP;
             [self addChildViewController:directionViewController];
             [self.view addSubview:directionViewController.view];
         }else if ([labelDic[label.accessibilityIdentifier] isKindOfClass:[ApplePolyLine class]]) {
@@ -86,6 +92,8 @@ NSMutableDictionary *labelDic;
             
             DirectionViewController *directionViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"DirectionViewController"];
             directionViewController.directionDataSource = polyline.directionDataSource;
+            directionViewController.polyLine = polyline;
+            directionViewController.mapType = APPLE_MAP;
             [self addChildViewController:directionViewController];
             [self.view addSubview:directionViewController.view];
         }
@@ -183,6 +191,8 @@ NSMutableDictionary *labelDic;
     }
 }
 
+#pragma mark LocationManager Delegate Method
+
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations
 {
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(locations.firstObject.coordinate, 800, 800);
@@ -194,37 +204,7 @@ NSMutableDictionary *labelDic;
     NSLog(@"Error: %@", error);
 }
 
-- (void) handleLongPress:(UILongPressGestureRecognizer *)recognizer {
-    CGPoint point = [recognizer locationInView:self.mapView];
-    CLLocationCoordinate2D tapPoint = [self.mapView convertPoint:point toCoordinateFromView:self.view];
-    
-    MKPointAnnotation *resultPoint = [[MKPointAnnotation alloc]init];
-    resultPoint.coordinate = tapPoint;
-    
-    [self convertlocationIntoString:tapPoint completionHandler:^(NSString *address){
-        resultPoint.title = address;
-        [self.mapView addAnnotation:resultPoint];
-    }];
-}
-
-- (void)convertlocationIntoString:(CLLocationCoordinate2D)point completionHandler:(void(^)(NSString*))completionBlock {
-    CLLocation *location = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
-    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
-    
-    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
-        if ([placemarks count] > 0) {
-            CLPlacemark *placeMark = [placemarks firstObject];
-            NSArray *address = placeMark.addressDictionary[@"FormattedAddressLines"];
-            completionBlock([address componentsJoinedByString:@", "]);
-        }else{
-            completionBlock(nil);
-        }
-    }];
-}
-
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    NSLog(@"hello");
-}
+#pragma mark Annotation Delegate Method
 
 - (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation {
     MKPinAnnotationView *annotationView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"annoView"];
@@ -241,17 +221,6 @@ NSMutableDictionary *labelDic;
     return annotationView;
 }
 
-- (UIImage *)imageFromColor:(UIColor *)color {
-    CGRect rect = CGRectMake(0, 0, 1, 1);
-    UIGraphicsBeginImageContext(rect.size);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, [color CGColor]);
-    CGContextFillRect(context, rect);
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control{
     AddressDetailViewController *addressDetailViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddressDetailViewController"];
     addressDetailViewController.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
@@ -264,6 +233,8 @@ NSMutableDictionary *labelDic;
     [self addChildViewController:addressDetailViewController];
     [self.view addSubview:addressDetailViewController.view];
 }
+
+#pragma mark Overlay Delegate Method
 
 - (MKPolylineRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(nonnull id<MKOverlay>)overlay {
     MKPolylineRenderer *polyRenderer = [[MKPolylineRenderer alloc] initWithOverlay:overlay];
@@ -302,28 +273,9 @@ NSMutableDictionary *labelDic;
     return polyRenderer;
 }
 
-- (int)countRouteCount {
-    NSArray *overlays = self.mapView.overlays;
-    int count = 0;
-    for (int i = 0; i < overlays.count; i++) {
-        if (![overlays[i] isKindOfClass:[MyPolyLine class]]) {
-            count++;
-        }
-    }
-    return count;
-}
-
-- (void)receiveTrafficNotification:(NSNotification *)notif {
-    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.object[@"latitude"] doubleValue], [notif.object[@"longitude"] doubleValue]);
-    NSArray *pointsArray = [self.mapView overlays];
-    [self.mapView removeOverlays:pointsArray];
-    [self downloadAccident:currentP];
-}
-
 - (void)plotOverlayOnMap:(MKPolyline*)polyline {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^(void){
         [self.mapView addOverlay:polyline];
-        //[self.mapView addOverlay:polyline level:MKOverlayLevelAboveRoads];
         [self.mapView setNeedsDisplay];
         if (self.mapView.overlays.count == 1) {
             [self.mapView setVisibleMapRect:polyline.boundingMapRect edgePadding:UIEdgeInsetsMake(2.0, 2.0, 2.0, 2.0) animated:false];
@@ -333,6 +285,8 @@ NSMutableDictionary *labelDic;
         }
     }];
 }
+
+#pragma mark Download Direction Method
 
 - (void)directionWithAppleMap:(MKPlacemark *)startPlaceMark endPlaceMark:(MKPlacemark *)endPlaceMark {
     MKMapItem *startItem = [[MKMapItem alloc]initWithPlacemark:startPlaceMark];
@@ -352,6 +306,8 @@ NSMutableDictionary *labelDic;
                 CLLocationCoordinate2D *polyLineCoord = malloc(route.polyline.pointCount*sizeof(CLLocationCoordinate2D));
                 [route.polyline getCoordinates:polyLineCoord range:NSMakeRange(0, route.polyline.pointCount)];
                 ApplePolyLine *applePolyLine = [ApplePolyLine polylineWithCoordinates:polyLineCoord count:route.polyline.pointCount];
+                applePolyLine.distance = route.distance;
+                applePolyLine.trafficTravelTime = time;
                 
                 [applePolyLine setTitle:[NSString stringWithFormat:@"%imin",time]];
                 
@@ -429,6 +385,29 @@ NSMutableDictionary *labelDic;
 
 }
 
+#pragma mark Notification Receiver Method
+
+- (void)receivePointTrafficNotification:(NSNotification *)notif {
+    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.object[@"longitude"] doubleValue]);
+    NSArray *pointsArray = [self.mapView overlays];
+    [self.mapView removeOverlays:pointsArray];
+    [self downloadAccident:[self createTrafficStringFromPoint:currentP]];
+}
+
+- (void)receiveOnRouteTrafficNotification:(NSNotification *)notif {
+    MKPolyline *polyLine = notif.userInfo[@"polyline"];
+    NSArray *pointsArray = [self.mapView overlays];
+    [self.mapView removeOverlays:pointsArray];
+    [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:NO]];
+}
+
+- (void)receiveAroundRouteTrafficNotification:(NSNotification *)notif {
+    MKPolyline *polyLine = notif.userInfo[@"polyline"];
+    NSArray *pointsArray = [self.mapView overlays];
+    [self.mapView removeOverlays:pointsArray];
+    [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:YES]];
+}
+
 - (void)receiveDirectionNotification:(NSNotification *)notif{
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
@@ -445,10 +424,9 @@ NSMutableDictionary *labelDic;
             }
         }];
     }];
-
-    
-    //[self directionWithAppleMap:startString endString:endString];
 }
+
+#pragma mark Create Location On Map Methods
 
 - (IBAction)searchMethod:(id)sender {
     [self convertStringIntoLocation:self.searchText.text completionHandler:^(MKPlacemark *placeMark){
@@ -460,45 +438,20 @@ NSMutableDictionary *labelDic;
     }];
 }
 
-- (void)convertStringIntoLocation:(NSString *)string completionHandler:(void(^)(MKPlacemark *))completionBlock{
-    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+- (void) handleLongPress:(UILongPressGestureRecognizer *)recognizer {
+    CGPoint point = [recognizer locationInView:self.mapView];
+    CLLocationCoordinate2D tapPoint = [self.mapView convertPoint:point toCoordinateFromView:self.view];
     
-    [geocoder geocodeAddressString:string completionHandler:^(NSArray* placemarks, NSError* error){
-        for (CLPlacemark *placeMark in placemarks){
-            MKPlacemark *realPlaceMark = [[MKPlacemark alloc]initWithPlacemark:placeMark];
-            completionBlock(realPlaceMark);
-        }
-        completionBlock(nil);
+    MKPointAnnotation *resultPoint = [[MKPointAnnotation alloc]init];
+    resultPoint.coordinate = tapPoint;
+    
+    [self convertlocationIntoString:tapPoint completionHandler:^(NSString *address){
+        resultPoint.title = address;
+        [self.mapView addAnnotation:resultPoint];
     }];
 }
 
-//- (void)plotTrafficRouteThread:(NSDictionary *)params {
-
-//    MKDirectionsRequest *directionRequest = params[@"request"];
-
-//    int severity = [params[@"severity"] intValue];
-
-//    [trafficIncidentLevelLock lock];
-
-//    self.trafficIncidentLevel = severity;
-
-//    MKDirections *directions = [[MKDirections alloc] initWithRequest:directionRequest];
-
-//    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
-
-//        if (!err) {
-
-//            NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"distance" ascending:YES];
-
-//            NSArray *sortedArray = [response.routes sortedArrayUsingDescriptors:@[sort]];
-
-//            [self plotTrafficOnMap: [sortedArray firstObject]];
-
-//        }
-
-//    }];
-
-//}
+#pragma mark Apple Maple Traffic Route Method
 
 - (void)plotTrafficRoute:(NSArray *)trafficDic {
     NSMutableSet *pointSet = [[NSMutableSet alloc]init];
@@ -575,33 +528,9 @@ NSMutableDictionary *labelDic;
     }
 }
 
-- (void)downloadRouteTraffic:(CLLocationCoordinate2D)source destination:(CLLocationCoordinate2D)destination completionHandler:(void(^)(int,int,NSArray*))completionBlock {
-    NSString *url = [NSString stringWithFormat:@"http://dev.virtualearth.net/REST/v1/Routes/Driving?wp.1=%f,%f&wp.2=%f,%f&ra=routePath&key=%@",(float)source.latitude, (float)source.longitude, (float)destination.latitude, (float)destination.longitude, bingMapKey];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
-    [request setHTTPMethod:@"GET"];
-    
-    NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if(error) {
-            NSLog(@"Error: %@", error);
-        }else {
-            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
-            NSError *err;
-            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
-            
-            if ([httpResponse statusCode] == 200){
-                NSDictionary *routeInfo = [[[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject] firstObject];
-                int travelTime = [routeInfo[@"travelDuration"] intValue]/60;
-                int trafficTravelTime = [routeInfo[@"travelDurationTraffic"]intValue]/60;
-                NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
-                completionBlock(travelTime, trafficTravelTime, allPoints);
-            }
-        }
-    }];
-    [task resume];
-}
+#pragma mark Download Traffic Method
 
-- (void)downloadAccident:(CLLocationCoordinate2D )address{
-    NSString *addressLine =  [NSString stringWithFormat:@"%f,%f,%f,%f", (int)address.latitude-0.5, (int)address.longitude-0.5, (int)address.latitude+0.5, (int)address.longitude+0.5];
+- (void)downloadAccident:(NSString *)addressLine{
     NSString *url = [NSString stringWithFormat:@"http://dev.virtualearth.net/REST/v1/Traffic/Incidents/%@/true?t=1,8,9&s=2,3,4&key=%@",addressLine, bingMapKey];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"GET"];
@@ -623,6 +552,79 @@ NSMutableDictionary *labelDic;
     [task resume];
 }
 
+#pragma mark Helper Method
+
+- (void)convertStringIntoLocation:(NSString *)string completionHandler:(void(^)(MKPlacemark *))completionBlock{
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
+    [geocoder geocodeAddressString:string completionHandler:^(NSArray* placemarks, NSError* error){
+        for (CLPlacemark *placeMark in placemarks){
+            MKPlacemark *realPlaceMark = [[MKPlacemark alloc]initWithPlacemark:placeMark];
+            completionBlock(realPlaceMark);
+        }
+        completionBlock(nil);
+    }];
+}
+
+- (void)convertlocationIntoString:(CLLocationCoordinate2D)point completionHandler:(void(^)(NSString*))completionBlock {
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
+        if ([placemarks count] > 0) {
+            CLPlacemark *placeMark = [placemarks firstObject];
+            NSArray *address = placeMark.addressDictionary[@"FormattedAddressLines"];
+            completionBlock([address componentsJoinedByString:@", "]);
+        }else{
+            completionBlock(nil);
+        }
+    }];
+}
+
+- (int)countRouteCount {
+    NSArray *overlays = self.mapView.overlays;
+    int count = 0;
+    for (int i = 0; i < overlays.count; i++) {
+        if (![overlays[i] isKindOfClass:[MyPolyLine class]]) {
+            count++;
+        }
+    }
+    return count;
+}
+
+- (NSString *)createTrafficStringFromPoint:(CLLocationCoordinate2D )address {
+    NSString *addressLine =  [NSString stringWithFormat:@"%f,%f,%f,%f", (int)address.latitude-0.5, (int)address.longitude-0.5, (int)address.latitude+0.5, (int)address.longitude+0.5];
+    return addressLine;
+}
+
+- (NSString *)createTrafficStringFromPolyline:(MKPolyline *)polyline inRange:(BOOL)inRange{
+    CLLocationCoordinate2D *allPointCoord = malloc(polyline.pointCount*sizeof(CLLocationCoordinate2D));
+    [polyline getCoordinates:allPointCoord range:NSMakeRange(0, polyline.pointCount)];
+    
+    double minLatitude = allPointCoord[0].latitude;
+    double maxLatitude = allPointCoord[0].latitude;
+    double minLongitude = allPointCoord[0].longitude;
+    double maxLongitude = allPointCoord[0].longitude;
+    for (int i = 1; i < polyline.pointCount; i++) {
+        if (allPointCoord[i].latitude < minLatitude) {
+            minLatitude = allPointCoord[i].latitude;
+        }else if (allPointCoord[i].latitude > maxLatitude) {
+            maxLatitude = allPointCoord[i].latitude;
+        }else if (allPointCoord[i].longitude < minLongitude) {
+            maxLongitude = allPointCoord[i].longitude;
+        }else if (allPointCoord[i].longitude > maxLongitude) {
+            maxLongitude = allPointCoord[i].longitude;
+        }
+    }
+    
+    NSString *trafficString;
+    if (!inRange) {
+        [NSString stringWithFormat:@"wp.1=%f,%f&wp.2=%f,%f", minLatitude, minLongitude, maxLatitude, maxLongitude];
+    }else {
+        [NSString stringWithFormat:@"wp.1=%f,%f&wp.2=%f,%f", minLatitude-0.5, minLongitude-0.5, maxLatitude+0.5, maxLongitude+0.5];
+    }
+    return trafficString;
+}
 
 - (double)distanceOfPoint:(MKMapPoint)pt toPoly:(MKPolyline *)poly
 {
@@ -661,35 +663,6 @@ NSMutableDictionary *labelDic;
     
     return distance;
 }
-
-
-/** Converts |px| to meters at location |pt| */
-- (double)metersFromPixel:(NSUInteger)px atPoint:(CGPoint)pt
-{
-    CGPoint ptB = CGPointMake(pt.x + px, pt.y);
-    
-    CLLocationCoordinate2D coordA = [self.mapView convertPoint:pt toCoordinateFromView:self.mapView];
-    CLLocationCoordinate2D coordB = [self.mapView convertPoint:ptB toCoordinateFromView:self.mapView];
-    
-    return MKMetersBetweenMapPoints(MKMapPointForCoordinate(coordA), MKMapPointForCoordinate(coordB));
-}
-
-
--(void)traffic {
-    
-    //            MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
-    
-    //            request.source = sourceItem;
-    
-    //            request.destination = destinationItem;
-    
-    //            request.requestsAlternateRoutes = true;
-    
-    //            request.transportType = MKDirectionsTransportTypeAutomobile;
-    
-}
-
-
 
 - (void)didReceiveMemoryWarning {
     

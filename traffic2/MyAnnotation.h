@@ -64,5 +64,7 @@ typedef enum {
 @interface ApplePolyLine : MKPolyline
 
 @property (nonatomic, retain, nonnull) NSArray *directionDataSource;
+@property (nonatomic, assign) int trafficTravelTime;
+@property (nonatomic, assign) int distance;
 
 @end

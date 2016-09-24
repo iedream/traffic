@@ -3,7 +3,6 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--First-->
@@ -247,8 +246,59 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="jUy-eJ-9m0">
-                                <rect key="frame" x="0.0" y="85" width="600" height="345"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zjg-dG-fgU">
+                                <rect key="frame" x="20" y="20" width="46" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="back:" destination="goG-YC-tG6" eventType="touchUpInside" id="QgD-VJ-y2s"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Travel Time With Traffic" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zYd-i8-x94">
+                                <rect key="frame" x="20" y="438" width="190" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Distance" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iWc-Ya-Ckp">
+                                <rect key="frame" x="20" y="479" width="76" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Travel Time Without Traffic" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2hP-zs-QLL">
+                                <rect key="frame" x="20" y="522" width="213" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Congestion" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Nz-C9-SDA">
+                                <rect key="frame" x="20" y="559" width="103" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Ke5-s8-2Nm">
+                                <rect key="frame" x="286" y="434" width="294" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="AP0-cE-0ss">
+                                <rect key="frame" x="286" y="518" width="294" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EBd-Z6-xkB">
+                                <rect key="frame" x="286" y="475" width="294" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="bezel" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="MZX-sC-Y96">
+                                <rect key="frame" x="286" y="555" width="294" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="jUy-eJ-9m0">
+                                <rect key="frame" x="0.0" y="129" width="600" height="274"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="directionCell" id="Nhe-bO-4EC">
@@ -261,27 +311,65 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zjg-dG-fgU">
-                                <rect key="frame" x="20" y="20" width="46" height="30"/>
-                                <state key="normal" title="Back"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Hv-3j-tV3">
+                                <rect key="frame" x="214" y="20" width="173" height="30"/>
+                                <state key="normal" title="Get Traffic On Route"/>
                                 <connections>
-                                    <action selector="back:" destination="goG-YC-tG6" eventType="touchUpInside" id="QgD-VJ-y2s"/>
+                                    <action selector="trafficOnRoute:" destination="goG-YC-tG6" eventType="touchUpInside" id="EWX-lX-dAS"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oiF-L7-tUN">
+                                <rect key="frame" x="210" y="69" width="180" height="30"/>
+                                <state key="normal" title="Get Traffic Around Route"/>
+                                <connections>
+                                    <action selector="trafficAroundRoute:" destination="goG-YC-tG6" eventType="touchUpInside" id="GzA-d7-3gK"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="oiF-L7-tUN" firstAttribute="centerX" secondItem="qhV-km-LyA" secondAttribute="centerX" id="1a6-gg-fCw"/>
+                            <constraint firstItem="oiF-L7-tUN" firstAttribute="top" secondItem="4Hv-3j-tV3" secondAttribute="bottom" constant="10" id="8Wm-99-1u2"/>
+                            <constraint firstItem="iWc-Ya-Ckp" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="20" id="8pr-BY-ljP"/>
                             <constraint firstItem="Zjg-dG-fgU" firstAttribute="top" secondItem="MWC-fB-Cxq" secondAttribute="bottom" constant="10" id="8ug-2i-w4S"/>
                             <constraint firstItem="Zjg-dG-fgU" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="10" id="9Rd-T6-RGV"/>
+                            <constraint firstItem="Ke5-s8-2Nm" firstAttribute="leading" secondItem="AP0-cE-0ss" secondAttribute="leading" id="AUW-3u-HOL"/>
+                            <constraint firstItem="iWc-Ya-Ckp" firstAttribute="top" secondItem="zYd-i8-x94" secondAttribute="bottom" constant="20" id="G0J-Xt-Oye"/>
+                            <constraint firstItem="6Nz-C9-SDA" firstAttribute="top" secondItem="2hP-zs-QLL" secondAttribute="bottom" constant="20" id="GAE-mF-TiX"/>
+                            <constraint firstItem="4Hv-3j-tV3" firstAttribute="top" secondItem="MWC-fB-Cxq" secondAttribute="bottom" constant="10" id="IwF-vq-28P"/>
+                            <constraint firstItem="2hP-zs-QLL" firstAttribute="top" secondItem="iWc-Ya-Ckp" secondAttribute="bottom" constant="20" id="Lmd-TC-VIn"/>
+                            <constraint firstItem="AP0-cE-0ss" firstAttribute="centerY" secondItem="2hP-zs-QLL" secondAttribute="centerY" id="M7d-Gd-ZPa"/>
+                            <constraint firstItem="jUy-eJ-9m0" firstAttribute="top" secondItem="oiF-L7-tUN" secondAttribute="bottom" constant="10" id="Ncw-9A-3Ah"/>
+                            <constraint firstItem="4Hv-3j-tV3" firstAttribute="centerX" secondItem="qhV-km-LyA" secondAttribute="centerX" id="OfR-XD-0Ct"/>
+                            <constraint firstItem="EBd-Z6-xkB" firstAttribute="leading" secondItem="AP0-cE-0ss" secondAttribute="leading" id="PK4-AP-hYN"/>
+                            <constraint firstAttribute="trailing" secondItem="MZX-sC-Y96" secondAttribute="trailing" constant="20" id="Rrx-18-IxK"/>
+                            <constraint firstAttribute="trailing" secondItem="AP0-cE-0ss" secondAttribute="trailing" constant="20" id="T05-1d-LtT"/>
+                            <constraint firstItem="zYd-i8-x94" firstAttribute="top" secondItem="jUy-eJ-9m0" secondAttribute="bottom" constant="30" id="UMH-CB-cSg"/>
+                            <constraint firstAttribute="trailing" secondItem="Ke5-s8-2Nm" secondAttribute="trailing" constant="20" id="YrR-Kp-EYE"/>
+                            <constraint firstItem="Ke5-s8-2Nm" firstAttribute="centerY" secondItem="zYd-i8-x94" secondAttribute="centerY" id="aXN-Uz-cVL"/>
                             <constraint firstItem="jUy-eJ-9m0" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" id="c3p-Sg-2cy"/>
-                            <constraint firstItem="jUy-eJ-9m0" firstAttribute="height" secondItem="qhV-km-LyA" secondAttribute="height" multiplier="0.5" constant="45" id="fI2-tY-o1x"/>
-                            <constraint firstItem="jUy-eJ-9m0" firstAttribute="top" secondItem="qhV-km-LyA" secondAttribute="top" constant="85" id="g1A-Gu-SiM"/>
+                            <constraint firstItem="zYd-i8-x94" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="20" id="dlU-v6-uEU"/>
+                            <constraint firstAttribute="trailing" secondItem="EBd-Z6-xkB" secondAttribute="trailing" constant="20" id="eWm-zc-wOD"/>
+                            <constraint firstItem="6Nz-C9-SDA" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="20" id="f1w-pc-fZq"/>
+                            <constraint firstItem="EBd-Z6-xkB" firstAttribute="centerY" secondItem="iWc-Ya-Ckp" secondAttribute="centerY" id="fKg-K5-Sls"/>
                             <constraint firstAttribute="trailing" secondItem="jUy-eJ-9m0" secondAttribute="trailing" id="gi8-ur-zvd"/>
-                            <constraint firstItem="jUy-eJ-9m0" firstAttribute="top" secondItem="Zjg-dG-fgU" secondAttribute="bottom" constant="35" id="r7F-Yj-gpM"/>
+                            <constraint firstItem="Z4Y-CD-UeL" firstAttribute="top" secondItem="6Nz-C9-SDA" secondAttribute="bottom" constant="20" id="h9k-S9-XCA"/>
+                            <constraint firstItem="MZX-sC-Y96" firstAttribute="leading" secondItem="AP0-cE-0ss" secondAttribute="leading" id="iNp-vg-Vl3"/>
+                            <constraint firstItem="2hP-zs-QLL" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="20" id="pFW-tm-gJF"/>
+                            <constraint firstItem="AP0-cE-0ss" firstAttribute="leading" secondItem="2hP-zs-QLL" secondAttribute="trailing" constant="20" id="yiv-lU-F6m"/>
+                            <constraint firstItem="MZX-sC-Y96" firstAttribute="centerY" secondItem="6Nz-C9-SDA" secondAttribute="centerY" id="yv5-YQ-gVr"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="congestionLabel" destination="6Nz-C9-SDA" id="JYd-G8-dfq"/>
+                        <outlet property="congestionText" destination="MZX-sC-Y96" id="wpK-ji-Bd3"/>
                         <outlet property="directionTableView" destination="jUy-eJ-9m0" id="tBa-lB-L1u"/>
+                        <outlet property="distanceLabel" destination="iWc-Ya-Ckp" id="i87-vm-9kQ"/>
+                        <outlet property="distanceText" destination="EBd-Z6-xkB" id="2aR-Dv-UUZ"/>
+                        <outlet property="trafficTravelTimeLabel" destination="zYd-i8-x94" id="9Zf-dV-1ow"/>
+                        <outlet property="trafficTravelTimeText" destination="Ke5-s8-2Nm" id="rm3-2M-JwZ"/>
+                        <outlet property="travelTimeLabel" destination="2hP-zs-QLL" id="bUE-vd-Puw"/>
+                        <outlet property="travelTimeText" destination="AP0-cE-0ss" id="So5-oF-kgC"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ytk-UW-1IV" userLabel="First Responder" sceneMemberID="firstResponder"/>
