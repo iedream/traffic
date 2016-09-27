@@ -388,21 +388,21 @@ NSMutableDictionary *labelDic;
 #pragma mark Notification Receiver Method
 
 - (void)receivePointTrafficNotification:(NSNotification *)notif {
-    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.object[@"longitude"] doubleValue]);
+    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.userInfo[@"longitude"] doubleValue]);
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:[self createTrafficStringFromPoint:currentP]];
 }
 
 - (void)receiveOnRouteTrafficNotification:(NSNotification *)notif {
-    MKPolyline *polyLine = notif.userInfo[@"polyline"];
+    MKPolyline *polyLine = notif.userInfo[@"polyLine"];
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:NO]];
 }
 
 - (void)receiveAroundRouteTrafficNotification:(NSNotification *)notif {
-    MKPolyline *polyLine = notif.userInfo[@"polyline"];
+    MKPolyline *polyLine = notif.userInfo[@"polyLine"];
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:YES]];
@@ -541,11 +541,13 @@ NSMutableDictionary *labelDic;
         }else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             NSError *err;
-            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&err];
             
             if ([httpResponse statusCode] == 200){
-                NSArray *trafficIncidents = [[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject];
-                [self plotTrafficRoute:trafficIncidents];
+                if ([[[[json valueForKey:@"resourceSets"] valueForKey:@"estimatedTotal"] firstObject]intValue]) {
+                    NSArray *trafficIncidents = [[[json valueForKey:@"resourceSets"] valueForKey:@"resources"] firstObject];
+                    [self plotTrafficRoute:trafficIncidents];
+                }
             }
         }
     }];
@@ -611,7 +613,7 @@ NSMutableDictionary *labelDic;
         }else if (allPointCoord[i].latitude > maxLatitude) {
             maxLatitude = allPointCoord[i].latitude;
         }else if (allPointCoord[i].longitude < minLongitude) {
-            maxLongitude = allPointCoord[i].longitude;
+            minLongitude = allPointCoord[i].longitude;
         }else if (allPointCoord[i].longitude > maxLongitude) {
             maxLongitude = allPointCoord[i].longitude;
         }
@@ -619,9 +621,9 @@ NSMutableDictionary *labelDic;
     
     NSString *trafficString;
     if (!inRange) {
-        [NSString stringWithFormat:@"wp.1=%f,%f&wp.2=%f,%f", minLatitude, minLongitude, maxLatitude, maxLongitude];
+        trafficString = [NSString stringWithFormat:@"%f,%f,%f,%f", minLatitude, minLongitude, maxLatitude, maxLongitude];
     }else {
-        [NSString stringWithFormat:@"wp.1=%f,%f&wp.2=%f,%f", minLatitude-0.5, minLongitude-0.5, maxLatitude+0.5, maxLongitude+0.5];
+        trafficString = [NSString stringWithFormat:@"%f,%f,%f,%f", minLatitude-0.5, minLongitude-0.5, maxLatitude+0.5, maxLongitude+0.5];
     }
     return trafficString;
 }

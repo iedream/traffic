@@ -11,6 +11,7 @@
 		4F9E428E1D80F1D70046B346 /* AddressDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */; };
 		4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */; };
 		4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */; };
+		4FC493521D9A0A76005533FF /* AddRouteWatchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */; };
 		4FDB6C021D78EAF200B668EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C011D78EAF200B668EE /* main.m */; };
 		4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C041D78EAF200B668EE /* AppDelegate.m */; };
 		4FDB6C081D78EAF200B668EE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C071D78EAF200B668EE /* FirstViewController.m */; };
@@ -51,6 +52,8 @@
 		4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetTrafficViewController.m; sourceTree = "<group>"; };
 		4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrafficRouteViewController.h; sourceTree = "<group>"; };
 		4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrafficRouteViewController.m; sourceTree = "<group>"; };
+		4FC493501D9A0A76005533FF /* AddRouteWatchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRouteWatchViewController.h; sourceTree = "<group>"; };
+		4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRouteWatchViewController.m; sourceTree = "<group>"; };
 		4FDB6BFD1D78EAF200B668EE /* traffic2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = traffic2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FDB6C011D78EAF200B668EE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4FDB6C031D78EAF200B668EE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -140,6 +143,8 @@
 				4FDB6C0F1D78EAF200B668EE /* Assets.xcassets */,
 				4FDB6C111D78EAF200B668EE /* LaunchScreen.storyboard */,
 				4FDB6C141D78EAF200B668EE /* Info.plist */,
+				4FC493501D9A0A76005533FF /* AddRouteWatchViewController.h */,
+				4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */,
 				4FDB6C001D78EAF200B668EE /* Supporting Files */,
 				4FE43A731D94CA5200D65073 /* DirectionViewController.h */,
 				4FE43A741D94CA5200D65073 /* DirectionViewController.m */,
@@ -308,6 +313,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FC493521D9A0A76005533FF /* AddRouteWatchViewController.m in Sources */,
 				4FDB6C0B1D78EAF200B668EE /* SecondViewController.m in Sources */,
 				4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */,
 				4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */,

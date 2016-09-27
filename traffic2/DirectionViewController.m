@@ -8,6 +8,8 @@
 
 #import "DirectionViewController.h"
 #import "MyAnnotation.h"
+#import "SecondViewController.h"
+#import "AddRouteWatchViewController.h"
 
 @interface DirectionViewController ()
 
@@ -110,6 +112,19 @@
                           nil];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetAroundRouteTrafficData" object:nil userInfo:dict];
 }
+
+- (IBAction)addRoute:(id)sender {
+    NSMutableDictionary *dict;
+    if ([self.polyLine isKindOfClass:[ApplePolyLine class]]) {
+        dict = [[SecondViewController sharedInstance] addWithAppleDirection:(ApplePolyLine*)self.polyLine];
+    }else if ([self.polyLine isKindOfClass:[BingPolyLine class]]) {
+        dict = [[SecondViewController sharedInstance] addWithBingDirection:(BingPolyLine*)self.polyLine];
+    }
+     AddRouteWatchViewController *getTrafficViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddRouteWatchViewController"];
+    [self addChildViewController:getTrafficViewController];
+    [self.view addSubview:getTrafficViewController.view];
+}
+
 
 /*
 #pragma mark - Navigation

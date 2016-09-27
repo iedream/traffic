@@ -325,6 +325,13 @@
                                     <action selector="trafficAroundRoute:" destination="goG-YC-tG6" eventType="touchUpInside" id="GzA-d7-3gK"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0jQ-9K-ru3">
+                                <rect key="frame" x="505" y="20" width="75" height="30"/>
+                                <state key="normal" title="Add"/>
+                                <connections>
+                                    <action selector="addRoute:" destination="goG-YC-tG6" eventType="touchUpInside" id="2YJ-S4-CHH"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -344,9 +351,11 @@
                             <constraint firstItem="EBd-Z6-xkB" firstAttribute="leading" secondItem="AP0-cE-0ss" secondAttribute="leading" id="PK4-AP-hYN"/>
                             <constraint firstAttribute="trailing" secondItem="MZX-sC-Y96" secondAttribute="trailing" constant="20" id="Rrx-18-IxK"/>
                             <constraint firstAttribute="trailing" secondItem="AP0-cE-0ss" secondAttribute="trailing" constant="20" id="T05-1d-LtT"/>
+                            <constraint firstAttribute="trailing" secondItem="0jQ-9K-ru3" secondAttribute="trailing" constant="20" id="U4b-fd-QrD"/>
                             <constraint firstItem="zYd-i8-x94" firstAttribute="top" secondItem="jUy-eJ-9m0" secondAttribute="bottom" constant="30" id="UMH-CB-cSg"/>
                             <constraint firstAttribute="trailing" secondItem="Ke5-s8-2Nm" secondAttribute="trailing" constant="20" id="YrR-Kp-EYE"/>
                             <constraint firstItem="Ke5-s8-2Nm" firstAttribute="centerY" secondItem="zYd-i8-x94" secondAttribute="centerY" id="aXN-Uz-cVL"/>
+                            <constraint firstItem="0jQ-9K-ru3" firstAttribute="top" secondItem="MWC-fB-Cxq" secondAttribute="bottom" constant="20" id="adb-Ak-Gtq"/>
                             <constraint firstItem="jUy-eJ-9m0" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" id="c3p-Sg-2cy"/>
                             <constraint firstItem="zYd-i8-x94" firstAttribute="leading" secondItem="qhV-km-LyA" secondAttribute="leading" constant="20" id="dlU-v6-uEU"/>
                             <constraint firstAttribute="trailing" secondItem="EBd-Z6-xkB" secondAttribute="trailing" constant="20" id="eWm-zc-wOD"/>
@@ -375,6 +384,54 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ytk-UW-1IV" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2037" y="360"/>
+        </scene>
+        <!--Add Route Watch View Controller-->
+        <scene sceneID="q99-o8-AHj">
+            <objects>
+                <viewController storyboardIdentifier="AddRouteWatchViewController" id="eRc-1W-hHe" customClass="AddRouteWatchViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="o5b-sx-fBJ"/>
+                        <viewControllerLayoutGuide type="bottom" id="tli-fH-j0h"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="EXj-YW-fp4">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <datePicker contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="JIH-Rv-44h">
+                                <rect key="frame" x="0.0" y="74" width="600" height="216"/>
+                                <date key="date" timeIntervalSinceReferenceDate="496633943.503914">
+                                    <!--2016-09-27 01:52:23 +0000-->
+                                </date>
+                            </datePicker>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vM4-DL-OJd">
+                                <rect key="frame" x="277" y="20" width="46" height="30"/>
+                                <state key="normal" title="Title"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lIe-l9-Fs4">
+                                <rect key="frame" x="240" y="326" width="121" height="30"/>
+                                <state key="normal" title="Add Watch Time"/>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="lIe-l9-Fs4" firstAttribute="centerX" secondItem="EXj-YW-fp4" secondAttribute="centerX" id="4wF-Cn-Emm"/>
+                            <constraint firstItem="vM4-DL-OJd" firstAttribute="top" secondItem="o5b-sx-fBJ" secondAttribute="bottom" constant="20" id="D7E-IC-IVK"/>
+                            <constraint firstItem="lIe-l9-Fs4" firstAttribute="top" secondItem="JIH-Rv-44h" secondAttribute="bottom" constant="20" id="OKF-LT-UUm"/>
+                            <constraint firstItem="vM4-DL-OJd" firstAttribute="centerX" secondItem="EXj-YW-fp4" secondAttribute="centerX" id="TCQ-aK-s0j"/>
+                            <constraint firstItem="JIH-Rv-44h" firstAttribute="leading" secondItem="EXj-YW-fp4" secondAttribute="leading" constant="20" id="cfe-UV-wzB"/>
+                            <constraint firstItem="JIH-Rv-44h" firstAttribute="top" secondItem="vM4-DL-OJd" secondAttribute="bottom" constant="20" id="eBD-Cb-6b1"/>
+                            <constraint firstAttribute="trailing" secondItem="JIH-Rv-44h" secondAttribute="trailing" constant="20" id="j2k-1x-B5f"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="addWatchTimeButton" destination="lIe-l9-Fs4" id="lid-Ug-ho5"/>
+                        <outlet property="datePicker" destination="JIH-Rv-44h" id="Ruf-JB-BM6"/>
+                        <outlet property="titleButton" destination="vM4-DL-OJd" id="BL8-9v-BNj"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6Id-V3-nAl" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2696" y="360"/>
         </scene>
         <!--Traffic Route View Controller-->
         <scene sceneID="WC7-Lg-NzC">

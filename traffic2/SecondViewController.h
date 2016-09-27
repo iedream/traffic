@@ -7,9 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MyAnnotation.h"
 
 @interface SecondViewController : UIViewController
-
-
++(SecondViewController*)sharedInstance;
+-(NSMutableDictionary*)addWithBingDirection:(BingPolyLine*)route;
+-(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route;
 @end
 
