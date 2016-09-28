@@ -411,6 +411,13 @@
                                 <rect key="frame" x="240" y="326" width="121" height="30"/>
                                 <state key="normal" title="Add Watch Time"/>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZNe-8v-B7Z">
+                                <rect key="frame" x="277" y="364" width="46" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="back:" destination="eRc-1W-hHe" eventType="touchUpInside" id="n8B-zQ-ueF"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>

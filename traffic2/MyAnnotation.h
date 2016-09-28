@@ -58,6 +58,7 @@ typedef enum {
 @property (nonatomic, assign) int distance;
 @property (nonatomic, retain, nonnull) NSString *congestion;
 @property (nonatomic, retain, nonnull) NSArray *directionDataSource;
+@property (nonatomic, retain, nonnull) NSString *name;
 @property (nonatomic, assign) CLLocationCoordinate2D source;
 @property (nonatomic, assign) CLLocationCoordinate2D dest;
 
@@ -68,6 +69,7 @@ typedef enum {
 @property (nonatomic, retain, nonnull) NSArray *directionDataSource;
 @property (nonatomic, assign) int trafficTravelTime;
 @property (nonatomic, assign) int distance;
+@property (nonatomic, retain, nonnull) NSString *name;
 @property (nonatomic, assign) CLLocationCoordinate2D source;
 @property (nonatomic, assign) CLLocationCoordinate2D dest;
 

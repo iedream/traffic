@@ -114,12 +114,16 @@
 }
 
 - (IBAction)addRoute:(id)sender {
-    NSMutableDictionary *dict;
-    if ([self.polyLine isKindOfClass:[ApplePolyLine class]]) {
-        dict = [[SecondViewController sharedInstance] addWithAppleDirection:(ApplePolyLine*)self.polyLine];
-    }else if ([self.polyLine isKindOfClass:[BingPolyLine class]]) {
-        dict = [[SecondViewController sharedInstance] addWithBingDirection:(BingPolyLine*)self.polyLine];
-    }
+//    NSMutableDictionary *dict;
+//    if ([self.polyLine isKindOfClass:[ApplePolyLine class]]) {
+//        dict = [[SecondViewController sharedInstance] addWithAppleDirection:(ApplePolyLine*)self.polyLine];
+//    }else if ([self.polyLine isKindOfClass:[BingPolyLine class]]) {
+//        dict = [[SecondViewController sharedInstance] addWithBingDirection:(BingPolyLine*)self.polyLine];
+//    }
+    NSDate *date = [NSDate date];
+    NSTimeInterval secondsInEightHours = 2;
+    NSDate *add90Min = [NSDate dateWithTimeIntervalSinceNow:3];
+    [[SecondViewController sharedInstance] scheduleNotificationWithTime:add90Min polyLine:(ApplePolyLine*)self.polyLine];
      AddRouteWatchViewController *getTrafficViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddRouteWatchViewController"];
     [self addChildViewController:getTrafficViewController];
     [self.view addSubview:getTrafficViewController.view];

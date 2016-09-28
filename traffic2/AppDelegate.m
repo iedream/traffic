@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "SecondViewController.h"
 
 @interface AppDelegate ()
 
@@ -17,7 +18,57 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    UILocalNotification *locationNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+    if ([locationNotification.alertAction isEqualToString:@"loadTrafficTime"]) {
+        NSLog(@"receive local");
+        UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+        SecondViewController *secondViewCon = navCon.viewControllers[1];
+        [secondViewCon getTrafficTimeWithAppleMap:locationNotification.userInfo completionHandler:^(double trafficTime) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%f for Route %@", trafficTime, locationNotification.userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action){
+                                                           //Do Some action here
+                                                           [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                       }];
+            [alert addAction:ok];
+            
+            [secondViewCon presentViewController:alert animated:YES completion:NULL];
+        }];
+    }
+    
     return YES;
+}
+
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+    NSLog(@"receive remote");
+    
+    if ([notification.alertAction isEqualToString:@"loadTrafficTime"]) {
+        
+        UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+        SecondViewController *secondViewCon = navCon.viewControllers[1];
+        [secondViewCon getTrafficTimeWithAppleMap:notification.userInfo completionHandler:^(double trafficTime) {
+            if ([application applicationState] == UIApplicationStateActive) {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%i for Route %@", (int)trafficTime, notification.userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
+                
+                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction * action){
+                                                               //Do Some action here
+                                                               [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                           }];
+                [alert addAction:ok];
+                [secondViewCon presentViewController:alert animated:YES completion:NULL];
+            }else {
+                    UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+                    localNotification.timeZone = [NSTimeZone localTimeZone];
+                    localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+                    localNotification.alertBody = [NSString stringWithFormat:@"%@ Route", notification.userInfo[@"name"]];
+                    localNotification.alertTitle = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, notification.userInfo[@"name"]];
+                    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+            }
+        }];
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

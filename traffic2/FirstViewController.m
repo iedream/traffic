@@ -308,6 +308,9 @@ NSMutableDictionary *labelDic;
                 ApplePolyLine *applePolyLine = [ApplePolyLine polylineWithCoordinates:polyLineCoord count:route.polyline.pointCount];
                 applePolyLine.distance = route.distance;
                 applePolyLine.trafficTravelTime = time;
+                applePolyLine.source = startPlaceMark.coordinate;
+                applePolyLine.dest = endPlaceMark.coordinate;
+                applePolyLine.name = route.name;
                 
                 [applePolyLine setTitle:[NSString stringWithFormat:@"%imin",time]];
                 

@@ -21,6 +21,8 @@ NSMutableArray *routeArr;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSDate *date = [NSDate date];
+    NSDate *add90Min = [date dateByAddingTimeInterval:(60)];
     // Do any additional setup after loading the view, typically from a nib.
 }
 
@@ -34,6 +36,7 @@ NSMutableArray *routeArr;
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+    //[self scheduleNotificationWithTime:[NSDate date]];
     // Dispose of any resources that can be recreated.
 }
 
@@ -41,6 +44,7 @@ NSMutableArray *routeArr;
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     [dict setValue:[NSNumber numberWithDouble:route.distance] forKey:@"distance"];
     [dict setValue:[NSNumber numberWithInt:route.trafficTravelTime] forKey:@"expectedTime"];
+    [dict setValue:route.name forKey:@"name"];
     NSDictionary *startDic = @{@"latitude":[NSNumber numberWithDouble:route.source.latitude], @"longitude":[NSNumber numberWithDouble:route.source.longitude]};
     [dict setValue:startDic forKey:@"source"];
     NSDictionary *endDic = @{@"latitude":[NSNumber numberWithDouble:route.dest.latitude], @"longitude":[NSNumber numberWithDouble:route.dest.longitude]};
@@ -60,6 +64,74 @@ NSMutableArray *routeArr;
     [dict setValue:endDic forKey:@"end"];
     [routeArr addObject:dict];
     return dict;
+}
+
+-(void)scheduleNotificationWithTime:(NSDate*)date polyLine:(ApplePolyLine *)polyLine{
+    UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
+                                                    UIUserNotificationTypeBadge |
+                                                    UIUserNotificationTypeSound);
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
+                                                                             categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
+    
+    UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+    localNotification.timeZone = [NSTimeZone localTimeZone];
+    localNotification.fireDate = date;
+    localNotification.alertAction = @"loadTrafficTime";
+    localNotification.userInfo = [self addWithAppleDirection:polyLine];
+    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+}
+
+- (void)getTrafficTimeWithAppleMap:(NSDictionary*)userInfo completionHandler:(void(^)(double))completionBlock {
+    double sourceLatitude = [[[userInfo valueForKey:@"source"] valueForKey:@"latitude"] doubleValue];
+    double sourceLongitude = [[[userInfo valueForKey:@"source"] valueForKey:@"longitude"] doubleValue];
+    double endLatitude = [[[userInfo valueForKey:@"end"] valueForKey:@"latitude"] doubleValue];
+    double endLongitude = [[[userInfo valueForKey:@"end"] valueForKey:@"longitude"] doubleValue];
+    CLLocationCoordinate2D sourcePoint = CLLocationCoordinate2DMake(sourceLatitude, sourceLongitude);
+    CLLocationCoordinate2D endPoint = CLLocationCoordinate2DMake(endLatitude, endLongitude);
+    MKPlacemark *sourcePlaceMark = [[MKPlacemark alloc] initWithCoordinate:sourcePoint addressDictionary:nil];
+    MKPlacemark *endPlaceMark = [[MKPlacemark alloc] initWithCoordinate:endPoint addressDictionary:nil];
+    MKMapItem *startItem = [[MKMapItem alloc]initWithPlacemark:sourcePlaceMark];
+    MKMapItem *endItem = [[MKMapItem alloc]initWithPlacemark:endPlaceMark];
+    
+        MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+        request.source = startItem;
+        request.destination = endItem;
+        request.requestsAlternateRoutes = true;
+        request.transportType = MKDirectionsTransportTypeAutomobile;
+    [self getAppleDirectionWithRequest:request name:userInfo[@"name"] completionBlock:^(double trafficTime) {
+        if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
+            UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+            localNotification.timeZone = [NSTimeZone localTimeZone];
+            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+            localNotification.alertBody = @"Hello";
+            localNotification.alertTitle = @"HI";
+            NSLog(@"hello");
+            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+        }
+        completionBlock(trafficTime);
+    }];
+}
+
+-(void)getAppleDirectionWithRequest:(MKDirectionsRequest*)request name:(NSString*)name completionBlock:(void(^)(double))completionBlock {
+    MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
+    [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
+        if (!err) {
+            BOOL returnVar = false;
+            for(MKRoute *route in response.routes) {
+                if ([route.name isEqualToString: name]) {
+                    int time = route.expectedTravelTime/60;
+                    returnVar = true;
+                    completionBlock(time);
+                    break;
+                }
+            }
+            if (!returnVar) {
+                [self getAppleDirectionWithRequest:request name:name completionBlock:completionBlock];
+            }
+        };
+    }];
 }
 
 -(void)readFromPlist {

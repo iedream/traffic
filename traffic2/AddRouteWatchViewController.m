@@ -23,6 +23,10 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+- (IBAction)back:(id)sender {
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
+}
 
 /*
 #pragma mark - Navigation

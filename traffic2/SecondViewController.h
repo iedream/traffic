@@ -13,5 +13,7 @@
 +(SecondViewController*)sharedInstance;
 -(NSMutableDictionary*)addWithBingDirection:(BingPolyLine*)route;
 -(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route;
+-(void)getTrafficTimeWithAppleMap:(NSDictionary*)userInfo completionHandler:(void(^)(double))completionBlock;
+-(void)scheduleNotificationWithTime:(NSDate*)date polyLine:(ApplePolyLine *)polyLine;
 @end
 
