@@ -18,39 +18,47 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
-    UILocalNotification *locationNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
-    if ([locationNotification.alertAction isEqualToString:@"loadTrafficTime"]) {
-        NSLog(@"receive local");
-        UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
-        SecondViewController *secondViewCon = navCon.viewControllers[1];
-        [secondViewCon getTrafficTimeWithAppleMap:locationNotification.userInfo completionHandler:^(double trafficTime) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%f for Route %@", trafficTime, locationNotification.userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
-            
-            UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * action){
-                                                           //Do Some action here
-                                                           [alert dismissViewControllerAnimated:YES completion:NULL];
-                                                       }];
-            [alert addAction:ok];
-            
-            [secondViewCon presentViewController:alert animated:YES completion:NULL];
-        }];
-    }
+    UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
+                                                    UIUserNotificationTypeBadge |
+                                                    UIUserNotificationTypeSound);
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
+                                                                             categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     
     return YES;
+}
+
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(nonnull UIUserNotificationSettings *)notificationSettings {
+    if (notificationSettings.types != UIUserNotificationTypeNone) {
+        [application registerForRemoteNotifications];
+    }
+
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    const char *data = [deviceToken bytes];
+    NSMutableString *token = [NSMutableString string];
+    
+    for (NSUInteger i = 0; i < [deviceToken length]; i++) {
+        [token appendFormat:@"%02.2hhX", data[i]];
+    }
+    NSLog(token);
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(error);
 }
 
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
     NSLog(@"receive remote");
     
     if ([notification.alertAction isEqualToString:@"loadTrafficTime"]) {
-        
+        application.applicationIconBadgeNumber = 1;
         UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
         SecondViewController *secondViewCon = navCon.viewControllers[1];
         [secondViewCon getTrafficTimeWithAppleMap:notification.userInfo completionHandler:^(double trafficTime) {
             if ([application applicationState] == UIApplicationStateActive) {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%i for Route %@", (int)trafficTime, notification.userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, notification.userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
                 
                 UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction * action){
@@ -59,16 +67,72 @@
                                                            }];
                 [alert addAction:ok];
                 [secondViewCon presentViewController:alert animated:YES completion:NULL];
+                application.applicationIconBadgeNumber = 0;
             }else {
                     UILocalNotification *localNotification = [[UILocalNotification alloc]init];
                     localNotification.timeZone = [NSTimeZone localTimeZone];
                     localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
-                    localNotification.alertBody = [NSString stringWithFormat:@"%@ Route", notification.userInfo[@"name"]];
-                    localNotification.alertTitle = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, notification.userInfo[@"name"]];
+                    localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", notification.userInfo[@"name"]];
+                    localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, notification.userInfo[@"name"]];
                     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
             }
         }];
     }
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    application.applicationIconBadgeNumber = 1;
+    UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+    SecondViewController *secondViewCon = navCon.viewControllers[1];
+    [secondViewCon getTrafficTimeWithAppleMap:userInfo completionHandler:^(double trafficTime) {
+        if ([application applicationState] == UIApplicationStateActive) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action){
+                                                           //Do Some action here
+                                                           [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                       }];
+            [alert addAction:ok];
+            [secondViewCon presentViewController:alert animated:YES completion:NULL];
+            application.applicationIconBadgeNumber = 0;
+        }else {
+            UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+            localNotification.timeZone = [NSTimeZone localTimeZone];
+            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+            localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
+            localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
+            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+        }
+    }];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    application.applicationIconBadgeNumber = 1;
+    UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+    SecondViewController *secondViewCon = navCon.viewControllers[1];
+    [secondViewCon getTrafficTimeWithAppleMap:userInfo completionHandler:^(double trafficTime) {
+        if ([application applicationState] == UIApplicationStateActive) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Traffic Time" message:[NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]] preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * action){
+                                                           //Do Some action here
+                                                           [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                       }];
+            [alert addAction:ok];
+            [secondViewCon presentViewController:alert animated:YES completion:NULL];
+            application.applicationIconBadgeNumber = 0;
+            completionHandler(UIBackgroundFetchResultNewData);
+        }else {
+            UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+            localNotification.timeZone = [NSTimeZone localTimeZone];
+            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+            localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
+            localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
+            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+        }
+    }];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

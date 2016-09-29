@@ -78,6 +78,8 @@ NSMutableArray *routeArr;
     UILocalNotification *localNotification = [[UILocalNotification alloc]init];
     localNotification.timeZone = [NSTimeZone localTimeZone];
     localNotification.fireDate = date;
+    localNotification.alertTitle = @"before";
+    localNotification.alertBody = @"init";
     localNotification.alertAction = @"loadTrafficTime";
     localNotification.userInfo = [self addWithAppleDirection:polyLine];
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
@@ -101,15 +103,6 @@ NSMutableArray *routeArr;
         request.requestsAlternateRoutes = true;
         request.transportType = MKDirectionsTransportTypeAutomobile;
     [self getAppleDirectionWithRequest:request name:userInfo[@"name"] completionBlock:^(double trafficTime) {
-        if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateActive) {
-            UILocalNotification *localNotification = [[UILocalNotification alloc]init];
-            localNotification.timeZone = [NSTimeZone localTimeZone];
-            localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
-            localNotification.alertBody = @"Hello";
-            localNotification.alertTitle = @"HI";
-            NSLog(@"hello");
-            [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-        }
         completionBlock(trafficTime);
     }];
 }

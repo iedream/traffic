@@ -121,8 +121,8 @@
 //        dict = [[SecondViewController sharedInstance] addWithBingDirection:(BingPolyLine*)self.polyLine];
 //    }
     NSDate *date = [NSDate date];
-    NSTimeInterval secondsInEightHours = 2;
-    NSDate *add90Min = [NSDate dateWithTimeIntervalSinceNow:3];
+    NSTimeInterval secondsInEightHours = 3;
+    NSDate *add90Min = [NSDate dateWithTimeIntervalSinceNow:5];
     [[SecondViewController sharedInstance] scheduleNotificationWithTime:add90Min polyLine:(ApplePolyLine*)self.polyLine];
      AddRouteWatchViewController *getTrafficViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddRouteWatchViewController"];
     [self addChildViewController:getTrafficViewController];
