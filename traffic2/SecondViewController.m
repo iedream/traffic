@@ -40,6 +40,62 @@ NSMutableArray *routeArr;
     // Dispose of any resources that can be recreated.
 }
 
+- (void)scheduleRemoteNotification:(ApplePolyLine*)applePolyLine {
+    NSString *clock = @"00 05 00";
+    NSString *days = @"6,7";
+    NSString *zoneContinent = @"America";
+    NSString *zoneCity = @"Toronto";
+    NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
+    
+    NSDictionary *userInfoDict = [self addWithAppleDirection:applePolyLine];
+    NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
+    NSDictionary *dict = @{@"userInfo":userInfoDict, @"time":timeDict};
+    
+    NSString *charactersToEscape = @"!*'();:@&=+$,/?%#[]\" ";
+    NSCharacterSet *customEncodingSet = [[NSCharacterSet characterSetWithCharactersInString:charactersToEscape] invertedSet];
+    
+    NSError *err;
+//    NSData *dictData = [NSJSONSerialization dataWithJSONObject:dict
+//                                    options:NSJSONWritingPrettyPrinted
+//                                      error:&err];
+
+   // NSData *dictData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&err];
+    NSData *stringDict = [NSJSONSerialization dataWithJSONObject:dict
+                                    options:0
+                                      error:&err];
+    NSString *requestJson = [[NSString alloc] initWithData:stringDict encoding:NSUTF8StringEncoding];
+    NSData *requestData = [requestJson dataUsingEncoding:NSUTF8StringEncoding];
+    //NSData *requestData = [stringDict dataUsingEncoding:NSUTF8StringEncoding];
+//    stringDict = [stringDict stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
+//    stringDict = [stringDict stringByTrimmingCharactersInSet:
+//                  [NSCharacterSet whitespaceCharacterSet]];
+//    stringDict = [NSString stringWithFormat:@"'%@'", stringDict];
+    //NSData *data = [di dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+
+    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/sendNotification/%@",deviceToken];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
+    [request setHTTPMethod:@"POST"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setValue:[NSString stringWithFormat:@"%d", [requestData length]] forHTTPHeaderField:@"Content-Length"];
+    [request setHTTPBody:requestData];
+    
+    NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if(error) {
+            NSLog(@"Error: %@", error);
+        }else {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            NSError *err;
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&err];
+            
+            if ([httpResponse statusCode] == 200){
+                NSLog(@"1");
+            }
+        }
+    }];
+    [task resume];
+}
+
 -(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route{
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     [dict setValue:[NSNumber numberWithDouble:route.distance] forKey:@"distance"];
@@ -49,6 +105,7 @@ NSMutableArray *routeArr;
     [dict setValue:startDic forKey:@"source"];
     NSDictionary *endDic = @{@"latitude":[NSNumber numberWithDouble:route.dest.latitude], @"longitude":[NSNumber numberWithDouble:route.dest.longitude]};
     [dict setValue:endDic forKey:@"end"];
+    [dict setValue:@"Apple" forKey:@"type"];
     [routeArr addObject:dict];
     return dict;
 }
@@ -103,6 +160,12 @@ NSMutableArray *routeArr;
         request.requestsAlternateRoutes = true;
         request.transportType = MKDirectionsTransportTypeAutomobile;
     [self getAppleDirectionWithRequest:request name:userInfo[@"name"] completionBlock:^(double trafficTime) {
+        UILocalNotification *localNotification = [[UILocalNotification alloc]init];
+        localNotification.timeZone = [NSTimeZone localTimeZone];
+        localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
+        localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
+        localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
+        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
         completionBlock(trafficTime);
     }];
 }

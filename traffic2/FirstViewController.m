@@ -114,6 +114,11 @@ NSMutableDictionary *labelDic;
     CLLocationCoordinate2D tapCoord = [self.mapView convertPoint:tapPoint toCoordinateFromView:self.mapView];
     MKMapPoint tapMapPoint = MKMapPointForCoordinate(tapCoord);
     for (id<MKOverlay> overlay in self.mapView.overlays) {
+        
+        CGPoint touchPt = [tap locationInView:self.mapView];
+        CLLocationCoordinate2D coord = [self.mapView convertPoint:touchPt toCoordinateFromView:self.mapView];
+        double maxMeters = [self metersFromPixel:22 atPoint:touchPt];
+        
         if ([overlay isKindOfClass:[MyPolyLine class]]) {
             MyPolyLine *polygon = (MyPolyLine*)overlay;
             if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50) {
@@ -166,7 +171,8 @@ NSMutableDictionary *labelDic;
             }
         } else if ([overlay isKindOfClass:[ApplePolyLine class]]) {
             MKPolyline *pointOverlay = (MKPolyline*)overlay;
-            if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < 50){
+            
+            if ([self distanceOfPoint:tapMapPoint toPoly:overlay] < maxMeters){
                 MKMapPoint middlePoint = pointOverlay.points[pointOverlay.pointCount/2];
                 CLLocationCoordinate2D middleCoor = MKCoordinateForMapPoint(middlePoint);
                 CGPoint actualPoint = [self.mapView convertCoordinate:middleCoor toPointToView:self.mapView];
@@ -667,6 +673,17 @@ NSMutableDictionary *labelDic;
     }
     
     return distance;
+}
+
+/** Converts |px| to meters at location |pt| */
+- (double)metersFromPixel:(NSUInteger)px atPoint:(CGPoint)pt
+{
+    CGPoint ptB = CGPointMake(pt.x + px, pt.y);
+    
+    CLLocationCoordinate2D coordA = [self.mapView convertPoint:pt toCoordinateFromView:self.mapView];
+    CLLocationCoordinate2D coordB = [self.mapView convertPoint:ptB toCoordinateFromView:self.mapView];
+    
+    return MKMetersBetweenMapPoints(MKMapPointForCoordinate(coordA), MKMapPointForCoordinate(coordB));
 }
 
 - (void)didReceiveMemoryWarning {
