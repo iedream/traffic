@@ -40,9 +40,31 @@ NSMutableArray *routeArr;
     // Dispose of any resources that can be recreated.
 }
 
+- (void)removeNotification {
+    NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
+    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@",deviceToken, @"Yonge%20St",@"00%2022%2001,1,2,3,4,5"];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
+    [request setHTTPMethod:@"DELETE"];
+    
+    NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if(error) {
+            NSLog(@"Error: %@", error);
+        }else {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+            NSError *err;
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
+            
+            if ([httpResponse statusCode] == 200){
+                NSLog(@"1");
+            }
+        }
+    }];
+    [task resume];
+}
+
 - (void)scheduleRemoteNotification:(ApplePolyLine*)applePolyLine {
-    NSString *clock = @"00 05 00";
-    NSString *days = @"6,7";
+    NSString *clock = @"00 22 01";
+    NSString *days = @"1,2,3,4,5";
     NSString *zoneContinent = @"America";
     NSString *zoneCity = @"Toronto";
     NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
@@ -86,9 +108,10 @@ NSMutableArray *routeArr;
         }else {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
             NSError *err;
-            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&err];
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
+                [self removeNotification];
                 NSLog(@"1");
             }
         }

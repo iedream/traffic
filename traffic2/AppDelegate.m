@@ -23,7 +23,7 @@
                                                     UIUserNotificationTypeSound);
     UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
                                                                              categories:nil];
-    //[[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     
     return YES;
 }
