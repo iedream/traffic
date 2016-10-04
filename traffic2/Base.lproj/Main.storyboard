@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <scenes>
         <!--First-->
@@ -193,6 +194,9 @@
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RKc-mr-aJK">
                                 <rect key="frame" x="277" y="409" width="46" height="30"/>
                                 <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="back:" destination="9bY-f4-AXo" eventType="touchUpInside" id="Vc6-lW-lk2"/>
+                                </connections>
                             </button>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="vZz-8l-t0c">
                                 <rect key="frame" x="220" y="286" width="160" height="29"/>
@@ -385,61 +389,6 @@
             </objects>
             <point key="canvasLocation" x="2037" y="360"/>
         </scene>
-        <!--Add Route Watch View Controller-->
-        <scene sceneID="q99-o8-AHj">
-            <objects>
-                <viewController storyboardIdentifier="AddRouteWatchViewController" id="eRc-1W-hHe" customClass="AddRouteWatchViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="o5b-sx-fBJ"/>
-                        <viewControllerLayoutGuide type="bottom" id="tli-fH-j0h"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="EXj-YW-fp4">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <datePicker contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="JIH-Rv-44h">
-                                <rect key="frame" x="0.0" y="74" width="600" height="216"/>
-                                <date key="date" timeIntervalSinceReferenceDate="496633943.503914">
-                                    <!--2016-09-27 01:52:23 +0000-->
-                                </date>
-                            </datePicker>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vM4-DL-OJd">
-                                <rect key="frame" x="277" y="20" width="46" height="30"/>
-                                <state key="normal" title="Title"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lIe-l9-Fs4">
-                                <rect key="frame" x="240" y="326" width="121" height="30"/>
-                                <state key="normal" title="Add Watch Time"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZNe-8v-B7Z">
-                                <rect key="frame" x="277" y="364" width="46" height="30"/>
-                                <state key="normal" title="Back"/>
-                                <connections>
-                                    <action selector="back:" destination="eRc-1W-hHe" eventType="touchUpInside" id="n8B-zQ-ueF"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="lIe-l9-Fs4" firstAttribute="centerX" secondItem="EXj-YW-fp4" secondAttribute="centerX" id="4wF-Cn-Emm"/>
-                            <constraint firstItem="vM4-DL-OJd" firstAttribute="top" secondItem="o5b-sx-fBJ" secondAttribute="bottom" constant="20" id="D7E-IC-IVK"/>
-                            <constraint firstItem="lIe-l9-Fs4" firstAttribute="top" secondItem="JIH-Rv-44h" secondAttribute="bottom" constant="20" id="OKF-LT-UUm"/>
-                            <constraint firstItem="vM4-DL-OJd" firstAttribute="centerX" secondItem="EXj-YW-fp4" secondAttribute="centerX" id="TCQ-aK-s0j"/>
-                            <constraint firstItem="JIH-Rv-44h" firstAttribute="leading" secondItem="EXj-YW-fp4" secondAttribute="leading" constant="20" id="cfe-UV-wzB"/>
-                            <constraint firstItem="JIH-Rv-44h" firstAttribute="top" secondItem="vM4-DL-OJd" secondAttribute="bottom" constant="20" id="eBD-Cb-6b1"/>
-                            <constraint firstAttribute="trailing" secondItem="JIH-Rv-44h" secondAttribute="trailing" constant="20" id="j2k-1x-B5f"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="addWatchTimeButton" destination="lIe-l9-Fs4" id="lid-Ug-ho5"/>
-                        <outlet property="datePicker" destination="JIH-Rv-44h" id="Ruf-JB-BM6"/>
-                        <outlet property="titleButton" destination="vM4-DL-OJd" id="BL8-9v-BNj"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="6Id-V3-nAl" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2696" y="360"/>
-        </scene>
         <!--Traffic Route View Controller-->
         <scene sceneID="WC7-Lg-NzC">
             <objects>
@@ -631,29 +580,91 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" text="Second View" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="zEq-FU-wV5">
-                                <rect key="frame" x="195" y="279" width="209.5" height="41.5"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="pOc-RW-Mym">
+                                <rect key="frame" x="0.0" y="57" width="600" height="258"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="36"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Loaded by SecondViewController" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NDk-cv-Gan">
-                                <rect key="frame" x="192" y="329" width="215.5" height="17"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="MyRouteTableCell" id="o4H-GS-P2B">
+                                        <rect key="frame" x="0.0" y="28" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="o4H-GS-P2B" id="EGp-hr-PNE">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                            <datePicker contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="8Fi-Pr-A1K">
+                                <rect key="frame" x="0.0" y="323" width="312" height="174"/>
+                                <date key="date" timeIntervalSinceReferenceDate="497238113.51570499">
+                                    <!--2016-10-04 01:41:53 +0000-->
+                                </date>
+                            </datePicker>
+                            <button opaque="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0dR-Y0-NBi">
+                                <rect key="frame" x="96" y="505" width="121" height="30"/>
+                                <state key="normal" title="Add Watch Time"/>
+                                <connections>
+                                    <action selector="addWatchTime:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="6So-BM-K1z"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fn8-eD-w18">
+                                <rect key="frame" x="408" y="9" width="105" height="30"/>
+                                <state key="normal" title="Back To Map"/>
+                                <connections>
+                                    <action selector="backToMap:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="nJP-Sq-2EO"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rlr-tK-mI0">
+                                <rect key="frame" x="87" y="9" width="138" height="30"/>
+                                <state key="normal" title="Back To Main List"/>
+                                <connections>
+                                    <action selector="backToMainList:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="joF-iV-37m"/>
+                                </connections>
+                            </button>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="o6K-i4-you">
+                                <rect key="frame" x="320" y="323" width="280" height="228"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="WeekDayTableCell" id="bGp-2j-BLR" customClass="WeekDayTableViewCell">
+                                        <rect key="frame" x="0.0" y="28" width="280" height="44"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bGp-2j-BLR" id="O0K-UH-l8v">
+                                            <rect key="frame" x="0.0" y="0.0" width="280" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="NDk-cv-Gan" firstAttribute="top" secondItem="zEq-FU-wV5" secondAttribute="bottom" constant="8" symbolic="YES" id="Day-4N-Vmt"/>
-                            <constraint firstItem="NDk-cv-Gan" firstAttribute="centerX" secondItem="zEq-FU-wV5" secondAttribute="centerX" id="JgO-Fn-dHn"/>
-                            <constraint firstAttribute="centerX" secondItem="zEq-FU-wV5" secondAttribute="centerX" id="qqM-NS-xev"/>
-                            <constraint firstAttribute="centerY" secondItem="zEq-FU-wV5" secondAttribute="centerY" id="qzY-Ky-pLD"/>
+                            <constraint firstItem="pOc-RW-Mym" firstAttribute="leading" secondItem="QS5-Rx-YEW" secondAttribute="leading" id="0jA-Pz-jkk"/>
+                            <constraint firstItem="0dR-Y0-NBi" firstAttribute="top" secondItem="8Fi-Pr-A1K" secondAttribute="bottom" constant="5" id="4av-wR-L9b"/>
+                            <constraint firstItem="Rlr-tK-mI0" firstAttribute="top" secondItem="QS5-Rx-YEW" secondAttribute="top" constant="5" id="5ae-jO-xxK"/>
+                            <constraint firstItem="o6K-i4-you" firstAttribute="height" secondItem="QS5-Rx-YEW" secondAttribute="height" multiplier="0.4" id="9Zy-9i-vSf"/>
+                            <constraint firstItem="o6K-i4-you" firstAttribute="leading" secondItem="8Fi-Pr-A1K" secondAttribute="trailing" constant="10" id="I5a-OH-QqT"/>
+                            <constraint firstItem="Rlr-tK-mI0" firstAttribute="centerX" secondItem="8Fi-Pr-A1K" secondAttribute="centerX" id="N7z-fD-zNd"/>
+                            <constraint firstItem="8Fi-Pr-A1K" firstAttribute="top" secondItem="o6K-i4-you" secondAttribute="top" id="QNy-9N-FSX"/>
+                            <constraint firstAttribute="trailing" secondItem="o6K-i4-you" secondAttribute="trailing" id="S91-ct-EoG"/>
+                            <constraint firstItem="pOc-RW-Mym" firstAttribute="top" secondItem="Fn8-eD-w18" secondAttribute="bottom" constant="10" id="Wed-vh-UF0"/>
+                            <constraint firstItem="8Fi-Pr-A1K" firstAttribute="top" secondItem="pOc-RW-Mym" secondAttribute="bottom" constant="10" id="ZCG-ke-rpT"/>
+                            <constraint firstItem="8Fi-Pr-A1K" firstAttribute="leading" secondItem="QS5-Rx-YEW" secondAttribute="leading" id="cXm-ig-8CW"/>
+                            <constraint firstItem="Fn8-eD-w18" firstAttribute="top" secondItem="QS5-Rx-YEW" secondAttribute="top" constant="5" id="eMY-Ia-5t9"/>
+                            <constraint firstItem="Djb-ko-YwX" firstAttribute="top" secondItem="o6K-i4-you" secondAttribute="bottom" constant="10" id="ePs-qU-zHs"/>
+                            <constraint firstItem="Djb-ko-YwX" firstAttribute="top" secondItem="0dR-Y0-NBi" secondAttribute="bottom" constant="5" id="g5D-Zu-dpP"/>
+                            <constraint firstAttribute="trailing" secondItem="pOc-RW-Mym" secondAttribute="trailing" id="kxr-1v-e02"/>
+                            <constraint firstItem="0dR-Y0-NBi" firstAttribute="centerX" secondItem="8Fi-Pr-A1K" secondAttribute="centerX" id="nit-bW-pPD"/>
+                            <constraint firstItem="o6K-i4-you" firstAttribute="top" secondItem="pOc-RW-Mym" secondAttribute="bottom" constant="10" id="udF-iW-lb7"/>
+                            <constraint firstItem="Fn8-eD-w18" firstAttribute="centerX" secondItem="o6K-i4-you" secondAttribute="centerX" id="wHW-yq-JTg"/>
+                            <constraint firstItem="o6K-i4-you" firstAttribute="width" secondItem="QS5-Rx-YEW" secondAttribute="width" multiplier="0.45" id="wIg-8J-IBp"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Second" image="second" id="cPa-gy-q4n"/>
+                    <connections>
+                        <outlet property="WeekDayTable" destination="o6K-i4-you" id="7mv-vV-VHi"/>
+                        <outlet property="myRouteTable" destination="pOc-RW-Mym" id="FmT-4V-EDn"/>
+                        <outlet property="timePicker" destination="8Fi-Pr-A1K" id="C54-DB-nTD"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
             </objects>

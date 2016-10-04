@@ -9,7 +9,6 @@
 #import "DirectionViewController.h"
 #import "MyAnnotation.h"
 #import "SecondViewController.h"
-#import "AddRouteWatchViewController.h"
 
 @interface DirectionViewController ()
 
@@ -99,6 +98,7 @@
     [self removeFromParentViewController];
     [self.view removeFromSuperview];
 }
+
 - (IBAction)trafficOnRoute:(id)sender {
     NSDictionary *dict = [[NSDictionary alloc]initWithObjectsAndKeys:
                           self.polyLine, @"polyLine",
@@ -114,19 +114,24 @@
 }
 
 - (IBAction)addRoute:(id)sender {
-//    NSMutableDictionary *dict;
-//    if ([self.polyLine isKindOfClass:[ApplePolyLine class]]) {
-//        dict = [[SecondViewController sharedInstance] addWithAppleDirection:(ApplePolyLine*)self.polyLine];
-//    }else if ([self.polyLine isKindOfClass:[BingPolyLine class]]) {
-//        dict = [[SecondViewController sharedInstance] addWithBingDirection:(BingPolyLine*)self.polyLine];
-//    }
-    NSDate *date = [NSDate date];
-    NSTimeInterval secondsInEightHours = 3;
-    NSDate *add90Min = [NSDate dateWithTimeIntervalSinceNow:5];
-    [[SecondViewController sharedInstance] scheduleRemoteNotification:(ApplePolyLine*)self.polyLine];
-     AddRouteWatchViewController *getTrafficViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AddRouteWatchViewController"];
-    [self addChildViewController:getTrafficViewController];
-    [self.view addSubview:getTrafficViewController.view];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Save Route" message:@"Enter A Route Name" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = @"Route Name";
+    }];
+    
+    UIAlertAction *save = [UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        
+        UITextField *textField = [alert.textFields firstObject];
+        NSDictionary *dict = @{@"polyLine": self.polyLine, @"name": textField.text};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"AddRoute" object:nil userInfo:dict];
+    }];
+    UIAlertAction *cancel = [UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:nil];
+    
+    [alert addAction:save];
+    [alert addAction:cancel];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 

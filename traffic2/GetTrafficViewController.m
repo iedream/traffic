@@ -7,6 +7,7 @@
 //
 
 #import "GetTrafficViewController.h"
+#import "AddressDetailViewController.h"
 
 @interface GetTrafficViewController ()
 
@@ -34,6 +35,17 @@
     [self.endTextField setText:newEnd];
 }
 
+- (IBAction)back:(id)sender {
+    AddressDetailViewController *addressDetailViewController = (AddressDetailViewController *)self.parentViewController;
+    UIView *superView = self.view.superview;
+    
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
+    
+    [addressDetailViewController removeFromParentViewController];
+    [superView removeFromSuperview];
+}
+
 - (IBAction)getDirection:(id)sender {
     NSDictionary *directionData = [[NSDictionary alloc] initWithObjectsAndKeys:
                                    self.startTextField.text, @"start",
@@ -41,8 +53,15 @@
                                    [NSNumber numberWithInteger:self.mapTypeSegment.selectedSegmentIndex], @"mapType",
                                    nil];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetDirectionData" object:nil userInfo:directionData];
+    
+    AddressDetailViewController *addressDetailViewController = (AddressDetailViewController *)self.parentViewController;
+    UIView *superView = self.view.superview;
+    
     [self removeFromParentViewController];
     [self.view removeFromSuperview];
+    
+    [addressDetailViewController removeFromParentViewController];
+    [superView removeFromSuperview];
 }
 
 -(void)setTextFieldProperties:(UITextField*)textField {

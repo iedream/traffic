@@ -235,9 +235,9 @@ NSMutableDictionary *labelDic;
     addressDetailViewController.mainViewController = self;
     [self convertlocationIntoString:self.currentPoint completionHandler:^(NSString *address){
         addressDetailViewController.currentLocationString = address;
+        [self addChildViewController:addressDetailViewController];
+        [self.view addSubview:addressDetailViewController.view];
     }];
-    [self addChildViewController:addressDetailViewController];
-    [self.view addSubview:addressDetailViewController.view];
 }
 
 #pragma mark Overlay Delegate Method

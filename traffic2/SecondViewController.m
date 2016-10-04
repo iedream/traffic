@@ -9,6 +9,7 @@
 #import "SecondViewController.h"
 #import <MapKit/MapKit.h>
 #import "MyAnnotation.h"
+#import "WeekDayTableViewCell.h"
 
 @interface SecondViewController ()
 
@@ -21,8 +22,14 @@ NSMutableArray *routeArr;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    NSDate *date = [NSDate date];
-    NSDate *add90Min = [date dateByAddingTimeInterval:(60)];
+    
+    self.WeekDayTable.delegate = self;
+    self.myRouteTable.delegate = self;
+    self.WeekDayTable.dataSource = self;
+    self.myRouteTable.dataSource = self;
+    
+    self.weekDaydata = @[@"MONDAY", @"TUESDAY", @"WEDNESDAY", @"THURSDAY", @"FRIDAY", @"SATURDAY", @"SUNDAY"];
+    self.myRouteData = routeArr;
     // Do any additional setup after loading the view, typically from a nib.
 }
 
@@ -73,33 +80,19 @@ NSMutableArray *routeArr;
     NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
     NSDictionary *dict = @{@"userInfo":userInfoDict, @"time":timeDict};
     
-    NSString *charactersToEscape = @"!*'();:@&=+$,/?%#[]\" ";
-    NSCharacterSet *customEncodingSet = [[NSCharacterSet characterSetWithCharactersInString:charactersToEscape] invertedSet];
-    
     NSError *err;
-//    NSData *dictData = [NSJSONSerialization dataWithJSONObject:dict
-//                                    options:NSJSONWritingPrettyPrinted
-//                                      error:&err];
-
-   // NSData *dictData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:&err];
     NSData *stringDict = [NSJSONSerialization dataWithJSONObject:dict
                                     options:0
                                       error:&err];
     NSString *requestJson = [[NSString alloc] initWithData:stringDict encoding:NSUTF8StringEncoding];
     NSData *requestData = [requestJson dataUsingEncoding:NSUTF8StringEncoding];
-    //NSData *requestData = [stringDict dataUsingEncoding:NSUTF8StringEncoding];
-//    stringDict = [stringDict stringByReplacingOccurrencesOfString:@"\n" withString:@" "];
-//    stringDict = [stringDict stringByTrimmingCharactersInSet:
-//                  [NSCharacterSet whitespaceCharacterSet]];
-//    stringDict = [NSString stringWithFormat:@"'%@'", stringDict];
-    //NSData *data = [di dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
 
     NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/sendNotification/%@",deviceToken];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
-    [request setValue:[NSString stringWithFormat:@"%d", [requestData length]] forHTTPHeaderField:@"Content-Length"];
+    [request setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[requestData length]] forHTTPHeaderField:@"Content-Length"];
     [request setHTTPBody:requestData];
     
     NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -111,8 +104,7 @@ NSMutableArray *routeArr;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
-                [self removeNotification];
-                NSLog(@"1");
+
             }
         }
     }];
@@ -144,25 +136,6 @@ NSMutableArray *routeArr;
     [dict setValue:endDic forKey:@"end"];
     [routeArr addObject:dict];
     return dict;
-}
-
--(void)scheduleNotificationWithTime:(NSDate*)date polyLine:(ApplePolyLine *)polyLine{
-    UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
-                                                    UIUserNotificationTypeBadge |
-                                                    UIUserNotificationTypeSound);
-    UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
-                                                                             categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
-    
-    UILocalNotification *localNotification = [[UILocalNotification alloc]init];
-    localNotification.timeZone = [NSTimeZone localTimeZone];
-    localNotification.fireDate = date;
-    localNotification.alertTitle = @"before";
-    localNotification.alertBody = @"init";
-    localNotification.alertAction = @"loadTrafficTime";
-    localNotification.userInfo = [self addWithAppleDirection:polyLine];
-    [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }
 
 - (void)getTrafficTimeWithAppleMap:(NSDictionary*)userInfo completionHandler:(void(^)(double))completionBlock {
@@ -223,6 +196,45 @@ NSMutableArray *routeArr;
 -(void)writeToPlist {
     [routeArr writeToFile:path atomically:NO];
 }
+
+- (IBAction)addWatchTime:(id)sender {
+}
+
+- (IBAction)backToMap:(id)sender {
+}
+
+- (IBAction)backToMainList:(id)sender {
+}
+
+#pragma mark LocationManager Delegate Method
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (tableView == self.myRouteTable) {
+        return self.myRouteData.count;
+    } else if (tableView == self.WeekDayTable) {
+        return self.weekDaydata.count;
+    } else {
+        return 0;
+    }
+}
+
+-(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView == self.WeekDayTable) {
+        WeekDayTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"WeekDayTableCell"];
+        cell.textView.text = [self.weekDaydata objectAtIndex:indexPath.row];
+        return cell;
+    }
+    return nil;
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (tableView == self.WeekDayTable) {
+        WeekDayTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        [cell didPressedOnCell];
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+}
+
 
 +(SecondViewController*)sharedInstance {
     if (!sharedInstance) {

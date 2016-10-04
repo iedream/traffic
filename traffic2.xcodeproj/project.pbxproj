@@ -11,7 +11,8 @@
 		4F9E428E1D80F1D70046B346 /* AddressDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */; };
 		4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */; };
 		4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */; };
-		4FC493521D9A0A76005533FF /* AddRouteWatchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */; };
+		4FD52D9E1DA34EC600A736AA /* checkMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FD52D9D1DA34EC600A736AA /* checkMark.png */; };
+		4FD52DA11DA3526C00A736AA /* WeekDayTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FD52DA01DA3526C00A736AA /* WeekDayTableViewCell.m */; };
 		4FDB6C021D78EAF200B668EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C011D78EAF200B668EE /* main.m */; };
 		4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C041D78EAF200B668EE /* AppDelegate.m */; };
 		4FDB6C081D78EAF200B668EE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C071D78EAF200B668EE /* FirstViewController.m */; };
@@ -52,8 +53,9 @@
 		4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetTrafficViewController.m; sourceTree = "<group>"; };
 		4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrafficRouteViewController.h; sourceTree = "<group>"; };
 		4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrafficRouteViewController.m; sourceTree = "<group>"; };
-		4FC493501D9A0A76005533FF /* AddRouteWatchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRouteWatchViewController.h; sourceTree = "<group>"; };
-		4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRouteWatchViewController.m; sourceTree = "<group>"; };
+		4FD52D9D1DA34EC600A736AA /* checkMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = checkMark.png; path = ../../Desktop/checkMark.png; sourceTree = "<group>"; };
+		4FD52D9F1DA3526C00A736AA /* WeekDayTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeekDayTableViewCell.h; sourceTree = "<group>"; };
+		4FD52DA01DA3526C00A736AA /* WeekDayTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeekDayTableViewCell.m; sourceTree = "<group>"; };
 		4FDB6BFD1D78EAF200B668EE /* traffic2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = traffic2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4FDB6C011D78EAF200B668EE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		4FDB6C031D78EAF200B668EE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 		4FDB6BF41D78EAF200B668EE = {
 			isa = PBXGroup;
 			children = (
+				4FD52D9D1DA34EC600A736AA /* checkMark.png */,
 				4FDB6C381D78F3C200B668EE /* CoreLocation.framework */,
 				4FDB6C361D78EBBD00B668EE /* MapKit.framework */,
 				4FDB6BFF1D78EAF200B668EE /* traffic2 */,
@@ -130,6 +133,8 @@
 		4FDB6BFF1D78EAF200B668EE /* traffic2 */ = {
 			isa = PBXGroup;
 			children = (
+				4FD52D9F1DA3526C00A736AA /* WeekDayTableViewCell.h */,
+				4FD52DA01DA3526C00A736AA /* WeekDayTableViewCell.m */,
 				4FDB6C031D78EAF200B668EE /* AppDelegate.h */,
 				4F756B621D86458D00C6DE47 /* MyAnnotation.h */,
 				4F756B631D86458D00C6DE47 /* MyAnnotation.m */,
@@ -143,8 +148,6 @@
 				4FDB6C0F1D78EAF200B668EE /* Assets.xcassets */,
 				4FDB6C111D78EAF200B668EE /* LaunchScreen.storyboard */,
 				4FDB6C141D78EAF200B668EE /* Info.plist */,
-				4FC493501D9A0A76005533FF /* AddRouteWatchViewController.h */,
-				4FC493511D9A0A76005533FF /* AddRouteWatchViewController.m */,
 				4FDB6C001D78EAF200B668EE /* Supporting Files */,
 				4FE43A731D94CA5200D65073 /* DirectionViewController.h */,
 				4FE43A741D94CA5200D65073 /* DirectionViewController.m */,
@@ -296,6 +299,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4FDB6C131D78EAF200B668EE /* LaunchScreen.storyboard in Resources */,
+				4FD52D9E1DA34EC600A736AA /* checkMark.png in Resources */,
 				4FDB6C101D78EAF200B668EE /* Assets.xcassets in Resources */,
 				4FDB6C0E1D78EAF200B668EE /* Main.storyboard in Resources */,
 			);
@@ -322,7 +326,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4FC493521D9A0A76005533FF /* AddRouteWatchViewController.m in Sources */,
+				4FD52DA11DA3526C00A736AA /* WeekDayTableViewCell.m in Sources */,
 				4FDB6C0B1D78EAF200B668EE /* SecondViewController.m in Sources */,
 				4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */,
 				4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */,

@@ -9,7 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "MyAnnotation.h"
 
-@interface SecondViewController : UIViewController
+@interface SecondViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@property (weak, nonatomic) IBOutlet UITableView *myRouteTable;
+@property (weak, nonatomic) IBOutlet UITableView *WeekDayTable;
+@property (weak, nonatomic) IBOutlet UIDatePicker *timePicker;
+
+@property (nonatomic, strong) NSArray *myRouteData;
+@property (nonatomic, strong) NSArray *weekDaydata;
+
+
 +(SecondViewController*)sharedInstance;
 -(NSMutableDictionary*)addWithBingDirection:(BingPolyLine*)route;
 -(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route;
