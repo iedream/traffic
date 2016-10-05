@@ -10,6 +10,7 @@
 #import <MapKit/MapKit.h>
 #import "MyAnnotation.h"
 #import "WeekDayTableViewCell.h"
+#import "MyRouteTableViewCell.h"
 
 @interface SecondViewController ()
 
@@ -19,6 +20,8 @@
 static SecondViewController *sharedInstance = nil;
 NSString *path;
 NSMutableArray *routeArr;
+NSMutableDictionary *weekDaysDict;
+NSMutableDictionary *currentDic;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -29,7 +32,12 @@ NSMutableArray *routeArr;
     self.myRouteTable.dataSource = self;
     
     self.weekDaydata = @[@"MONDAY", @"TUESDAY", @"WEDNESDAY", @"THURSDAY", @"FRIDAY", @"SATURDAY", @"SUNDAY"];
+    weekDaysDict = [[NSMutableDictionary alloc]init];
+    routeArr = [[NSMutableArray alloc]init];
     self.myRouteData = routeArr;
+    
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(addToMyRouteDic:) name:@"AddRoute" object:nil];
     // Do any additional setup after loading the view, typically from a nib.
 }
 
@@ -69,16 +77,15 @@ NSMutableArray *routeArr;
     [task resume];
 }
 
-- (void)scheduleRemoteNotification:(ApplePolyLine*)applePolyLine {
-    NSString *clock = @"00 22 01";
-    NSString *days = @"1,2,3,4,5";
+- (void)scheduleRemoteNotification {
+    NSString *clock = currentDic[@"clock"];
+    NSString *days = currentDic[@"date"];
     NSString *zoneContinent = @"America";
     NSString *zoneCity = @"Toronto";
     NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
     
-    NSDictionary *userInfoDict = [self addWithAppleDirection:applePolyLine];
     NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
-    NSDictionary *dict = @{@"userInfo":userInfoDict, @"time":timeDict};
+    NSDictionary *dict = @{@"userInfo":currentDic, @"time":timeDict};
     
     NSError *err;
     NSData *stringDict = [NSJSONSerialization dataWithJSONObject:dict
@@ -111,6 +118,37 @@ NSMutableArray *routeArr;
     [task resume];
 }
 
+- (void)addToMyRouteDic:(NSNotification *)notif {
+    MKPolyline *polyline = notif.userInfo[@"polyLine"];
+    NSString *name = notif.userInfo[@"name"];
+    
+    NSMutableDictionary *dict;
+    if ([polyline isKindOfClass:[ApplePolyLine class]]) {
+        ApplePolyLine *applyLine = (ApplePolyLine *)polyline;
+        dict = [self addWithAppleDirection:applyLine];
+        dict[@"routeName"] = name;
+        [self convertlocationIntoString:applyLine.source completionHandler:^(NSString *sourceString) {
+            [self convertlocationIntoString:applyLine.dest completionHandler:^(NSString *destString) {
+                dict[@"sourceString"] = sourceString;
+                dict[@"destString"] = destString;
+                [routeArr addObject:dict];
+                [self.myRouteTable reloadData];
+            }];
+        }];
+    } else if ([polyline isKindOfClass:[BingPolyLine class]]) {
+        BingPolyLine *applyLine = (BingPolyLine *)polyline;
+        dict = [self addWithBingDirection:applyLine];
+        dict[@"routenName"] = name;
+        [self convertlocationIntoString:applyLine.source completionHandler:^(NSString *sourceString) {
+            [self convertlocationIntoString:applyLine.dest completionHandler:^(NSString *destString) {
+                dict[@"sourceString"] = sourceString;
+                dict[@"destString"] = destString;
+                [routeArr addObject:dict];
+            }];
+        }];
+    }
+}
+
 -(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route{
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     [dict setValue:[NSNumber numberWithDouble:route.distance] forKey:@"distance"];
@@ -121,7 +159,6 @@ NSMutableArray *routeArr;
     NSDictionary *endDic = @{@"latitude":[NSNumber numberWithDouble:route.dest.latitude], @"longitude":[NSNumber numberWithDouble:route.dest.longitude]};
     [dict setValue:endDic forKey:@"end"];
     [dict setValue:@"Apple" forKey:@"type"];
-    [routeArr addObject:dict];
     return dict;
 }
 
@@ -134,8 +171,22 @@ NSMutableArray *routeArr;
     [dict setValue:startDic forKey:@"source"];
     NSDictionary *endDic = @{@"latitude":[NSNumber numberWithDouble:route.dest.latitude], @"longitude":[NSNumber numberWithDouble:route.dest.longitude]};
     [dict setValue:endDic forKey:@"end"];
-    [routeArr addObject:dict];
     return dict;
+}
+
+- (void)convertlocationIntoString:(CLLocationCoordinate2D)point completionHandler:(void(^)(NSString*))completionBlock {
+    CLLocation *location = [[CLLocation alloc] initWithLatitude:point.latitude longitude:point.longitude];
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray* placemarks, NSError* error){
+        if ([placemarks count] > 0) {
+            CLPlacemark *placeMark = [placemarks firstObject];
+            NSArray *address = placeMark.addressDictionary[@"FormattedAddressLines"];
+            completionBlock([address firstObject]);
+        }else{
+            completionBlock(nil);
+        }
+    }];
 }
 
 - (void)getTrafficTimeWithAppleMap:(NSDictionary*)userInfo completionHandler:(void(^)(double))completionBlock {
@@ -198,6 +249,44 @@ NSMutableArray *routeArr;
 }
 
 - (IBAction)addWatchTime:(id)sender {
+    NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
+    [outputFormatter setDateFormat:@"HH:mm a"];
+    NSString *time = [outputFormatter stringFromDate:self.timePicker.date];
+    NSArray *timeArray = [time componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@": "]];
+    NSString *finalTimeString = [NSString stringWithFormat:@"00 %@ %@",timeArray[1],timeArray[0]];
+    NSString *dateString = [self getSelectedDates];
+    [currentDic setObject:finalTimeString forKey:@"clock"];
+    [currentDic setObject:dateString forKey:@"date"];
+    [self scheduleRemoteNotification];
+}
+
+- (NSString *)getSelectedDates {
+    NSString *dateString = @"";
+    if ([weekDaysDict[@"MONDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"1"];
+    }
+    if ([weekDaysDict[@"TUESDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"2"];
+    }
+    if ([weekDaysDict[@"WEDNESDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"3"];
+    }
+    if ([weekDaysDict[@"THURSDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"4"];
+    }
+    if ([weekDaysDict[@"FRIDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"5"];
+    }
+    if ([weekDaysDict[@"SATURDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"6"];
+    }
+    if ([weekDaysDict[@"SUNDAY"] boolValue]) {
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"7"];
+    }
+    if (dateString.length > 1) {
+        dateString = [dateString substringFromIndex:1];
+    }
+    return dateString;
 }
 
 - (IBAction)backToMap:(id)sender {
@@ -222,6 +311,16 @@ NSMutableArray *routeArr;
     if (tableView == self.WeekDayTable) {
         WeekDayTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"WeekDayTableCell"];
         cell.textView.text = [self.weekDaydata objectAtIndex:indexPath.row];
+        if ([[weekDaysDict objectForKey:cell.textView.text] boolValue]) {
+            cell.checkView.hidden = NO;
+        }
+        return cell;
+    } else if (tableView == self.myRouteTable) {
+        MyRouteTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MyRouteTableCell"];
+        NSDictionary *dict = [self.myRouteData objectAtIndex:indexPath.row];
+        cell.titleLabel.text = dict[@"routeName"];
+        cell.sourceLabel.text = dict[@"sourceString"];
+        cell.destLabel.text = dict[@"destString"];
         return cell;
     }
     return nil;
@@ -230,7 +329,11 @@ NSMutableArray *routeArr;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (tableView == self.WeekDayTable) {
         WeekDayTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        [cell didPressedOnCell];
+        BOOL isChecked = [cell didPressedOnCell];
+        [weekDaysDict setObject:[NSNumber numberWithBool:isChecked] forKey:cell.textView.text];
+    } else if (tableView == self.myRouteTable) {
+        MyRouteTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+        currentDic = [self.myRouteData objectAtIndex:indexPath.row];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }

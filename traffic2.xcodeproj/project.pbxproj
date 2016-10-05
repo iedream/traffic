@@ -11,6 +11,7 @@
 		4F9E428E1D80F1D70046B346 /* AddressDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9E428D1D80F1D70046B346 /* AddressDetailViewController.m */; };
 		4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */; };
 		4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */; };
+		4FABC8EF1DA48FC200FE9F2B /* MyRouteTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FABC8EE1DA48FC200FE9F2B /* MyRouteTableViewCell.m */; };
 		4FD52D9E1DA34EC600A736AA /* checkMark.png in Resources */ = {isa = PBXBuildFile; fileRef = 4FD52D9D1DA34EC600A736AA /* checkMark.png */; };
 		4FD52DA11DA3526C00A736AA /* WeekDayTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FD52DA01DA3526C00A736AA /* WeekDayTableViewCell.m */; };
 		4FDB6C021D78EAF200B668EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4FDB6C011D78EAF200B668EE /* main.m */; };
@@ -53,6 +54,8 @@
 		4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GetTrafficViewController.m; sourceTree = "<group>"; };
 		4FAB97871D8B7FAA00DB84A5 /* TrafficRouteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrafficRouteViewController.h; sourceTree = "<group>"; };
 		4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrafficRouteViewController.m; sourceTree = "<group>"; };
+		4FABC8ED1DA48FC200FE9F2B /* MyRouteTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyRouteTableViewCell.h; sourceTree = "<group>"; };
+		4FABC8EE1DA48FC200FE9F2B /* MyRouteTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyRouteTableViewCell.m; sourceTree = "<group>"; };
 		4FD52D9D1DA34EC600A736AA /* checkMark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = checkMark.png; path = ../../Desktop/checkMark.png; sourceTree = "<group>"; };
 		4FD52D9F1DA3526C00A736AA /* WeekDayTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WeekDayTableViewCell.h; sourceTree = "<group>"; };
 		4FD52DA01DA3526C00A736AA /* WeekDayTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WeekDayTableViewCell.m; sourceTree = "<group>"; };
@@ -157,6 +160,8 @@
 				4FAB97881D8B7FAA00DB84A5 /* TrafficRouteViewController.m */,
 				4F9EA7CC1D8E39DA0039FD6E /* GetTrafficViewController.h */,
 				4F9EA7CD1D8E39DA0039FD6E /* GetTrafficViewController.m */,
+				4FABC8ED1DA48FC200FE9F2B /* MyRouteTableViewCell.h */,
+				4FABC8EE1DA48FC200FE9F2B /* MyRouteTableViewCell.m */,
 			);
 			path = traffic2;
 			sourceTree = "<group>";
@@ -330,6 +335,7 @@
 				4FDB6C0B1D78EAF200B668EE /* SecondViewController.m in Sources */,
 				4FDB6C051D78EAF200B668EE /* AppDelegate.m in Sources */,
 				4FAB97891D8B7FAA00DB84A5 /* TrafficRouteViewController.m in Sources */,
+				4FABC8EF1DA48FC200FE9F2B /* MyRouteTableViewCell.m in Sources */,
 				4F9EA7CE1D8E39DA0039FD6E /* GetTrafficViewController.m in Sources */,
 				4FE43A751D94CA5200D65073 /* DirectionViewController.m in Sources */,
 				4F756B641D86458D00C6DE47 /* MyAnnotation.m in Sources */,

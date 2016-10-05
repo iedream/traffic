@@ -12,29 +12,42 @@
 
 - (void)awakeFromNib {
     // Initialization code
-    CGRect frame = self.bounds;
+    [super awakeFromNib];
     
-    CGRect imageframe = CGRectMake(0, 5, 30, frame.size.height-10);
-    self.checkView = [[UIImageView alloc]initWithFrame:imageframe];
+    self.checkView = [[UIImageView alloc]init];
     self.checkView.image = [UIImage imageNamed:@"checkMark.png"];
     self.checkView.contentMode = UIViewContentModeScaleAspectFit;
-
     self.checkView.hidden = YES;
     [self addSubview:self.checkView];
     
-    CGRect textframe = CGRectMake(CGRectGetMaxX(imageframe) + 10, 0, frame.size.width - CGRectGetMaxX(imageframe) - 10, frame.size.height);
-    self.textView = [[UILabel alloc]initWithFrame:textframe];
+    self.textView = [[UILabel alloc]init];
     self.textView.adjustsFontSizeToFitWidth = YES;
     [self addSubview:self.textView];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
     // Configure the view for the selected state
 }
 
-- (void)didPressedOnCell {
+- (void)drawRect:(CGRect)rect {
+    [super drawRect:rect];
+    CGRect frame = self.bounds;
+    self.separatorInset = UIEdgeInsetsZero;
+    
+    CGRect imageframe = CGRectMake(0, 5, 30, frame.size.height-10);
+    self.checkView.frame = imageframe;
+    
+    CGRect textframe = CGRectMake(CGRectGetMaxX(imageframe) + 10, 0, frame.size.width - CGRectGetMaxX(imageframe) - 10, frame.size.height);
+    self.textView.frame = textframe;
+}
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    self.checkView.hidden = YES;
+}
+
+- (BOOL)didPressedOnCell {
     if (self.isChecked) {
         self.checkView.hidden = YES;
         self.isChecked = NO;
@@ -42,6 +55,7 @@
         self.checkView.hidden = NO;
         self.isChecked = YES;
     }
+    return self.isChecked;
 }
 
 @end

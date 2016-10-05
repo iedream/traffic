@@ -14,6 +14,5 @@
 @property (nonatomic, strong) UILabel *textView;
 @property (nonatomic) BOOL isChecked;
 
-- (void)didPressedOnCell;
-
+- (BOOL)didPressedOnCell;
 @end
