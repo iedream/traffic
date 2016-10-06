@@ -22,11 +22,14 @@
     SecondViewController *secondViewCon = navCon.viewControllers[1];
     [secondViewCon initWithPlist];
     
+    UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc]init];
+    NSSet *categories = [NSSet setWithObject:notificationCategory];
+    
     UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
                                                     UIUserNotificationTypeBadge |
                                                     UIUserNotificationTypeSound);
     UIUserNotificationSettings *settings = [UIUserNotificationSettings settingsForTypes:userNotificationTypes
-                                                                             categories:nil];
+                                                                             categories:categories];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     
     return YES;
