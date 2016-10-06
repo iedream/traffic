@@ -14,7 +14,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *WeekDayTable;
 @property (weak, nonatomic) IBOutlet UIDatePicker *timePicker;
 
-@property (nonatomic, strong) NSArray *myRouteData;
+@property (nonatomic, strong) NSMutableArray *myRouteData;
 @property (nonatomic, strong) NSArray *weekDaydata;
 
 
@@ -24,5 +24,6 @@
 -(void)getTrafficTimeWithAppleMap:(NSDictionary*)userInfo completionHandler:(void(^)(double))completionBlock;
 -(void)scheduleNotificationWithTime:(NSDate*)date polyLine:(ApplePolyLine *)polyLine;
 - (void)scheduleRemoteNotification:(ApplePolyLine*)applePolyLine;
+- (void)initWithPlist;
 @end
 

@@ -13,7 +13,7 @@ typedef enum {
     BING_MAP,
 } MapType;
 
-@interface GetTrafficViewController : UIViewController
+@interface GetTrafficViewController : UIViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *startTextField;
 @property (weak, nonatomic) IBOutlet UITextField *endTextField;
 @property (strong, nonatomic) NSString *currentLocationAddress;

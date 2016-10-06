@@ -30,23 +30,25 @@ NSMutableDictionary *currentDic;
     self.myRouteTable.delegate = self;
     self.WeekDayTable.dataSource = self;
     self.myRouteTable.dataSource = self;
-    
-    self.weekDaydata = @[@"MONDAY", @"TUESDAY", @"WEDNESDAY", @"THURSDAY", @"FRIDAY", @"SATURDAY", @"SUNDAY"];
-    weekDaysDict = [[NSMutableDictionary alloc]init];
-    routeArr = [[NSMutableArray alloc]init];
-    self.myRouteData = routeArr;
-    
-    
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(addToMyRouteDic:) name:@"AddRoute" object:nil];
+
     // Do any additional setup after loading the view, typically from a nib.
 }
 
 - (void)initWithPlist {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *path = [[paths firstObject] stringByAppendingString: @"RouteDirectory"];
-    path = [path stringByAppendingPathComponent:@"route.plist"];
+    self.weekDaydata = @[@"MONDAY", @"TUESDAY", @"WEDNESDAY", @"THURSDAY", @"FRIDAY", @"SATURDAY", @"SUNDAY"];
+    weekDaysDict = [[NSMutableDictionary alloc]init];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(addToMyRouteDic:) name:@"AddRoute" object:nil];
     
-    routeArr = [[NSMutableArray alloc]init];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    path = [paths firstObject];
+    path = [path stringByAppendingPathComponent:@"/route.plist"];
+    
+    if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
+        routeArr = [[NSMutableArray alloc] initWithContentsOfFile:path];
+    } else {
+        routeArr = [[NSMutableArray alloc]init];
+    }
+    self.myRouteData = routeArr;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -55,9 +57,13 @@ NSMutableDictionary *currentDic;
     // Dispose of any resources that can be recreated.
 }
 
-- (void)removeNotification {
-    NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
-    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@",deviceToken, @"Yonge%20St",@"00%2022%2001,1,2,3,4,5"];
+- (void)removeNotificationWithClock:(NSString*)clock days:(NSString*)days {
+    clock = [clock stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+    NSString *name = [[routeArr objectAtIndex:[routeArr indexOfObject:currentDic]] objectForKey:@"routeName"];
+    name = [name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
+    
+    NSString *deviceToken = @"5060EABE8B8D552B1B06C7855E27B27EB2F1D9F8BDDC640BFE9765BBBD021C72";
+    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@,%@",deviceToken, name, clock, days];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"DELETE"];
     
@@ -70,19 +76,25 @@ NSMutableDictionary *currentDic;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
-                NSLog(@"1");
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Scheduling Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
+                
+                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction * action){
+                                                               //Do Some action here
+                                                               [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                           }];
+                [alert addAction:ok];
+                [self presentViewController:alert animated:YES completion:NULL];
             }
         }
     }];
     [task resume];
 }
 
-- (void)scheduleRemoteNotification {
-    NSString *clock = currentDic[@"clock"];
-    NSString *days = currentDic[@"date"];
+- (void)scheduleRemoteNotificationWithClock:(NSString*)clock days:(NSString*)days{
     NSString *zoneContinent = @"America";
     NSString *zoneCity = @"Toronto";
-    NSString *deviceToken = @"8A22947AEBE44234748012290E89DB4BB2C7EA9798B80E6ADCD86A0C99EFD055";
+    NSString *deviceToken = @"5060EABE8B8D552B1B06C7855E27B27EB2F1D9F8BDDC640BFE9765BBBD021C72";
     
     NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
     NSDictionary *dict = @{@"userInfo":currentDic, @"time":timeDict};
@@ -111,7 +123,15 @@ NSMutableDictionary *currentDic;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
-
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cancel Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
+                
+                UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction * action){
+                                                               //Do Some action here
+                                                               [alert dismissViewControllerAnimated:YES completion:NULL];
+                                                           }];
+                [alert addAction:ok];
+                [self presentViewController:alert animated:YES completion:NULL];
             }
         }
     }];
@@ -131,7 +151,9 @@ NSMutableDictionary *currentDic;
             [self convertlocationIntoString:applyLine.dest completionHandler:^(NSString *destString) {
                 dict[@"sourceString"] = sourceString;
                 dict[@"destString"] = destString;
+                dict[@"notification"] = [[NSMutableArray alloc]init];
                 [routeArr addObject:dict];
+                [self writeToPlist];
                 [self.myRouteTable reloadData];
             }];
         }];
@@ -143,7 +165,10 @@ NSMutableDictionary *currentDic;
             [self convertlocationIntoString:applyLine.dest completionHandler:^(NSString *destString) {
                 dict[@"sourceString"] = sourceString;
                 dict[@"destString"] = destString;
+                dict[@"notification"] = [[NSMutableArray alloc]init];
                 [routeArr addObject:dict];
+                [self writeToPlist];
+                [self.myRouteTable reloadData];
             }];
         }];
     }
@@ -237,15 +262,8 @@ NSMutableDictionary *currentDic;
     }];
 }
 
--(void)readFromPlist {
-    if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
-        NSData *data = [[NSData alloc] initWithContentsOfFile:path];
-        routeArr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    }
-}
-
 -(void)writeToPlist {
-    [routeArr writeToFile:path atomically:NO];
+    [routeArr writeToFile:path atomically:YES];
 }
 
 - (IBAction)addWatchTime:(id)sender {
@@ -255,9 +273,13 @@ NSMutableDictionary *currentDic;
     NSArray *timeArray = [time componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@": "]];
     NSString *finalTimeString = [NSString stringWithFormat:@"00 %@ %@",timeArray[1],timeArray[0]];
     NSString *dateString = [self getSelectedDates];
-    [currentDic setObject:finalTimeString forKey:@"clock"];
-    [currentDic setObject:dateString forKey:@"date"];
-    [self scheduleRemoteNotification];
+    
+    NSMutableArray *clockArray = [currentDic objectForKey:@"notification"];
+    [clockArray addObject:@[finalTimeString, dateString]];
+    [currentDic setObject:clockArray forKey:@"notification"];
+    [self writeToPlist];
+    [self.myRouteTable reloadData];
+    [self scheduleRemoteNotificationWithClock:finalTimeString days:dateString];
 }
 
 - (NSString *)getSelectedDates {
@@ -289,10 +311,19 @@ NSMutableDictionary *currentDic;
     return dateString;
 }
 
+- (void)cancelAllNotif {
+    NSArray *notif = currentDic[@"notification"];
+    for (NSArray *arr in notif) {
+        [self removeNotificationWithClock:[arr firstObject] days:[arr lastObject]];
+    }
+}
+
 - (IBAction)backToMap:(id)sender {
 }
 
 - (IBAction)backToMainList:(id)sender {
+    self.myRouteData = routeArr;
+    [self.myRouteTable reloadData];
 }
 
 #pragma mark LocationManager Delegate Method
@@ -315,12 +346,21 @@ NSMutableDictionary *currentDic;
             cell.checkView.hidden = NO;
         }
         return cell;
-    } else if (tableView == self.myRouteTable) {
+    } else if (tableView == self.myRouteTable && self.myRouteData == routeArr) {
         MyRouteTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"MyRouteTableCell"];
         NSDictionary *dict = [self.myRouteData objectAtIndex:indexPath.row];
         cell.titleLabel.text = dict[@"routeName"];
         cell.sourceLabel.text = dict[@"sourceString"];
         cell.destLabel.text = dict[@"destString"];
+        return cell;
+    } else if (tableView == self.myRouteTable && self.myRouteData != routeArr) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"BasicCell"];
+        if (!cell) {
+            cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"BasicCell"];
+        }
+        NSArray *array = [self.myRouteData objectAtIndex:indexPath.row];
+        NSString *string = [NSString stringWithFormat:@"Time:%@ Date:%@", array.firstObject, array.lastObject];
+        cell.textLabel.text = string;
         return cell;
     }
     return nil;
@@ -331,11 +371,29 @@ NSMutableDictionary *currentDic;
         WeekDayTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
         BOOL isChecked = [cell didPressedOnCell];
         [weekDaysDict setObject:[NSNumber numberWithBool:isChecked] forKey:cell.textView.text];
-    } else if (tableView == self.myRouteTable) {
-        MyRouteTableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    } else if (tableView == self.myRouteTable && self.myRouteData == routeArr) {
         currentDic = [self.myRouteData objectAtIndex:indexPath.row];
+        self.myRouteData = [[routeArr objectAtIndex:indexPath.row] objectForKey:@"notification"];
+        [self.myRouteTable reloadData];
     }
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+}
+
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        if (tableView == self.myRouteTable && self.myRouteData != routeArr) {
+            NSArray *arr = [self.myRouteData objectAtIndex:indexPath.row];
+            [self removeNotificationWithClock:[arr firstObject] days:[arr lastObject]];
+            [self.myRouteData removeObjectAtIndex:indexPath.row];
+            [self writeToPlist];
+            [self.myRouteTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
+        } else if (tableView == self.myRouteTable && self.myRouteData == routeArr) {
+            [self cancelAllNotif];
+            [self.myRouteData removeObjectAtIndex:indexPath.row];
+            [self writeToPlist];
+            [self.myRouteTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
+        }
+    }
 }
 
 

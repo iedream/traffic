@@ -21,6 +21,9 @@
     [self setTextFieldProperties:self.endTextField];
     [self.startTextField setText:self.currentLocationAddress];
     [self.endTextField setText:self.endPointAddress];
+    
+    self.startTextField.delegate = self;
+    self.endTextField.delegate = self;
     // Do any additional setup after loading the view.
 }
 
@@ -67,6 +70,11 @@
 -(void)setTextFieldProperties:(UITextField*)textField {
     [textField setContentCompressionResistancePriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
     [textField setContentHuggingPriority:UILayoutPriorityDefaultLow forAxis:UILayoutConstraintAxisHorizontal];
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
 }
 
 /*
