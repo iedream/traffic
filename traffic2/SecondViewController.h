@@ -25,5 +25,6 @@
 -(void)scheduleNotificationWithTime:(NSDate*)date polyLine:(ApplePolyLine *)polyLine;
 - (void)scheduleRemoteNotification:(ApplePolyLine*)applePolyLine;
 - (void)initWithPlist;
+- (void)addDataToStorageWithCompletionHandler:(void(^)(NSString*))completionBlock;
 @end
 

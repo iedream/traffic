@@ -24,7 +24,6 @@
     
     UIMutableUserNotificationCategory *notificationCategory = [[UIMutableUserNotificationCategory alloc]init];
     NSSet *categories = [NSSet setWithObject:notificationCategory];
-    
     UIUserNotificationType userNotificationTypes = (UIUserNotificationTypeAlert |
                                                     UIUserNotificationTypeBadge |
                                                     UIUserNotificationTypeSound);
@@ -32,7 +31,21 @@
                                                                              categories:categories];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     
+    
+    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:1.0];
     return YES;
+}
+
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+    UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+    SecondViewController *secondViewCon = navCon.viewControllers[1];
+    [secondViewCon addDataToStorageWithCompletionHandler:^(NSString *result) {
+        if ([result isEqualToString:@"success"]) {
+            completionHandler(UIBackgroundFetchResultNewData);
+        } else {
+            completionHandler(UIBackgroundFetchResultFailed);
+        }
+    }];
 }
 
 - (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(nonnull UIUserNotificationSettings *)notificationSettings {
@@ -77,6 +90,7 @@
             UILocalNotification *localNotification = [[UILocalNotification alloc]init];
             localNotification.timeZone = [NSTimeZone localTimeZone];
             localNotification.fireDate = [NSDate date];
+            localNotification.soundName = @"ping.aiff";
             localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
             localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
             [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];

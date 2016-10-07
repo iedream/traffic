@@ -11,6 +11,7 @@
 #import "MyAnnotation.h"
 #import "WeekDayTableViewCell.h"
 #import "MyRouteTableViewCell.h"
+#import "dataGraphViewController.h"
 
 @interface SecondViewController ()
 
@@ -232,13 +233,6 @@ NSMutableDictionary *currentDic;
         request.requestsAlternateRoutes = true;
         request.transportType = MKDirectionsTransportTypeAutomobile;
     [self getAppleDirectionWithRequest:request name:userInfo[@"name"] completionBlock:^(double trafficTime) {
-        UILocalNotification *localNotification = [[UILocalNotification alloc]init];
-        localNotification.timeZone = [NSTimeZone localTimeZone];
-        localNotification.fireDate = [NSDate dateWithTimeIntervalSinceNow:1];
-        localNotification.soundName = @"ping.aiff";
-        localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
-        localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
-        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
         completionBlock(trafficTime);
     }];
 }
@@ -320,11 +314,49 @@ NSMutableDictionary *currentDic;
 }
 
 - (IBAction)backToMap:(id)sender {
+    dataGraphViewController *dataGraphViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"dataGraphViewController"];
+    [self addChildViewController:dataGraphViewController];
+    [self.view addSubview:dataGraphViewController.view];
 }
 
 - (IBAction)backToMainList:(id)sender {
     self.myRouteData = routeArr;
     [self.myRouteTable reloadData];
+}
+
+- (void)addDataToStorageWithCompletionHandler:(void(^)(NSString*))completionBlock {
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basicPath = [paths firstObject];
+    NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+    [timeFormatter setDateFormat:@"HH:mm a"];
+    NSDateFormatter *weekFormatter = [[NSDateFormatter alloc] init];
+    [weekFormatter setDateFormat: @"EEEE"];
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat: @"yyyy-MM-dd"];
+    
+
+    for (NSDictionary *dict in routeArr) {
+        NSString *routeName = dict[@"routeName"];
+        NSString *routePath = [basicPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", routeName]];
+        NSMutableDictionary *timeDic = [[NSMutableDictionary alloc]init];
+        if ([[NSFileManager defaultManager]fileExistsAtPath:routePath]) {
+            timeDic = [[NSMutableDictionary alloc] initWithContentsOfFile:routePath];
+        } else {
+            timeDic = [[NSMutableDictionary alloc]init];
+        }
+        [self getTrafficTimeWithAppleMap:dict completionHandler:^(double trafficTime) {
+            completionBlock(@"success");
+            if (trafficTime) {
+                NSString *timeString = [timeFormatter stringFromDate:[NSDate date]];
+                NSString *weekString = [[weekFormatter stringFromDate:[NSDate date]] capitalizedString];
+                NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
+                NSString *key = [NSString stringWithFormat:@"%@,%@", dateString, timeString];
+                NSDictionary *dict = @{@"trafficTime":@(trafficTime), @"time":timeString, @"weekday":weekString};
+                [timeDic setObject:dict forKey:key];
+                [timeDic writeToFile:routePath atomically:NO];
+            }
+        }];
+    }
 }
 
 #pragma mark LocationManager Delegate Method
@@ -377,7 +409,6 @@ NSMutableDictionary *currentDic;
         self.myRouteData = [[routeArr objectAtIndex:indexPath.row] objectForKey:@"notification"];
         [self.myRouteTable reloadData];
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
