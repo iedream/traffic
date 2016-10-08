@@ -14,19 +14,20 @@
 
 @implementation dataGraphViewController
 
+const NSString *plotIdentifier = @"TrafficData";
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     CGRect frame;
-    frame.size.width = self.view.bounds.size.width - 40;
-    frame.size.height = self.view.bounds.size.height - 80;
-    frame.origin.y = 20;
     frame.origin.x = 20;
+    frame.origin.y = 20;
+    frame.size.width = self.view.frame.size.width - 40;
+    frame.size.height = self.view.frame.size.height - 80;
     self.hostGraphView = [[CPTGraphHostingView alloc]initWithFrame:frame];
-    self.hostGraphView.layer.borderWidth = 5.0f;
-    self.hostGraphView.layer.borderColor = [[UIColor blackColor] CGColor];
     [self.view addSubview:self.hostGraphView];
-    [self configureHostView];
-    [self configureFrameSize];
+    
+    [self configurePlot];
+    [self configurePlotRange];
     // Do any additional setup after loading the view.
 }
 
@@ -35,58 +36,160 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)configureHostView {
-    self.graph = [[CPTXYGraph alloc]initWithFrame:self.view.bounds];
-    self.hostGraphView.hostedGraph = self.graph;
-    self.graph.paddingLeft = 0.0;
-    self.graph.paddingTop = 0.0;
-    self.graph.paddingRight = 0.0;
-    self.graph.paddingBottom = 0.0;
-    self.graph.axisSet = nil;
+- (void)setDataForGraph:(NSString *)routeName {
+    [self.segmentControl setSelectedSegmentIndex:5];
+    [self.segmentControl sendActionsForControlEvents:UIControlEventValueChanged];
     
-    CPTMutableTextStyle *textStyle = [[CPTMutableTextStyle alloc]init];
-    textStyle.color = [CPTColor blackColor];
-    textStyle.fontSize = 16.0;
-    textStyle.textAlignment = CPTTextAlignmentCenter;
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basicPath = [paths firstObject];
+    NSString *routePath = [basicPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", routeName]];
     
-    self.graph.title = @"Traffic Data";
-    self.graph.titleTextStyle = textStyle;
-    self.graph.titlePlotAreaFrameAnchor = CPTRectAnchorTop;
-    
-    CPTScatterPlot *plot = [[CPTScatterPlot alloc] initWithFrame:CGRectZero];
-    plot.dataSource = self;
-    plot.delegate = self;
-    [self.graph addPlot:plot toPlotSpace:self.graph.defaultPlotSpace];
+    NSArray *data;
+    if ([[NSFileManager defaultManager]fileExistsAtPath:routePath]) {
+        data = [[NSArray alloc] initWithContentsOfFile:routePath];
+    } else {
+        data = @[];
+    }
+    self.allDataDic = [self processData:data];
+    [self setGraphData];
 }
 
-- (void)configureFrameSize {
+- (void)setGraphData {
+    self.dataSource = [self.allDataDic objectForKey:[self getSegmentKey]];
+    CPTPlot *plot = [self.hostGraphView.hostedGraph plotWithIdentifier:plotIdentifier];
+    [plot reloadData];
+}
+
+- (NSDictionary *)processData:(NSArray*)dataArr {
+    NSMutableDictionary *dataByWeekDay = [[NSMutableDictionary alloc]init];
+    for (NSDictionary *dictByDay in dataArr) {
+        NSString *weekDayString = [dictByDay objectForKey:@"weekday"];
+        NSMutableArray *arr;
+        if ([dataByWeekDay objectForKey:weekDayString]) {
+            arr = [[NSMutableArray alloc]initWithArray:[dataByWeekDay objectForKey:weekDayString]];
+        }else {
+            arr = [[NSMutableArray alloc]init];
+        }
+        [arr addObject:dictByDay];
+        [dataByWeekDay setObject:[arr copy] forKey:weekDayString];
+    }
+    NSDictionary *finalResultData = [self getWeekDayData:dataByWeekDay];
+    return finalResultData;
+}
+
+- (NSDictionary *)getWeekDayData:(NSDictionary *)weekDayDic {
+    NSMutableDictionary *finalDic = [[NSMutableDictionary alloc]init];
+    for (NSString *weekDay in [weekDayDic allKeys]) {
+        NSArray *weekDayArr = [weekDayDic objectForKey:weekDay];
+        NSArray *resultHourArr = [self getAverageOfData:weekDayArr];
+        [finalDic setObject:resultHourArr forKey:weekDay];
+    }
+    return [finalDic copy];
+}
+
+- (NSArray *)getAverageOfData:(NSArray*)weekDayArr {
+    NSMutableDictionary *resultDic = [[NSMutableDictionary alloc]init];
+    for (NSDictionary *iDict in weekDayArr) {
+        
+        NSString *timeString = [iDict objectForKey:@"time"];
+        NSString *amString = @" AM";
+        NSString *pmString = @" PM";
+        NSArray *timeArr;
+        if ([timeString containsString:amString]) {
+            timeArr = [timeString componentsSeparatedByString:amString];
+            NSString *actTimeComp = [timeArr firstObject];
+            timeArr = [actTimeComp componentsSeparatedByString:@":"];
+        } else if ([timeString containsString:pmString]) {
+            timeArr = [timeString componentsSeparatedByString:pmString];
+            NSString *actTimeComp = [timeArr firstObject];
+            timeArr = [actTimeComp componentsSeparatedByString:@":"];
+        }
+        
+        int hour = [[timeArr firstObject] intValue];
+        int minute = [[timeArr lastObject] intValue];
+        if (minute >= 30) {
+            hour += 1;
+        }
+        
+        NSString *resultDicKey = [NSString stringWithFormat:@"%i", hour];
+        NSDictionary *timeDic = [resultDic objectForKey:resultDicKey];
+        
+        int totalValue = [[timeDic objectForKey:@"Value"] intValue];
+        totalValue += [[iDict objectForKey:@"trafficTime"] intValue];
+        int totalCount = [[timeDic objectForKey:@"Count"] intValue];
+        totalCount += 1;
+        
+        [resultDic setObject:@{@"Value":@(totalValue), @"Count":@(totalCount)} forKey:resultDicKey];
+    }
+    
+    NSMutableArray *finalArr = [[NSMutableArray alloc]init];
+    for (NSString *key in [resultDic allKeys]) {
+        NSDictionary *dict = [resultDic objectForKey:key];
+        if ([dict objectForKey:@"Count"] > 0) {
+            int average = [[dict objectForKey:@"Value"] intValue] / [[dict objectForKey:@"Count"] intValue];
+            NSDictionary *resDict = @{key:@(average)};
+            [finalArr addObject:resDict];
+        }
+    }
+    return [finalArr copy];
+}
+
+- (void)configurePlot {
+    CPTXYGraph *graph = [[CPTXYGraph alloc]initWithFrame:CGRectZero];
+    graph.title = @"Traffic Data";
+    
+    CPTBarPlot *plot = [[CPTBarPlot alloc] init];
+    plot.dataSource = self;
+    plot.identifier = @"TrafficData";
+    [graph addPlot:plot];
+    
+    self.hostGraphView.hostedGraph = graph;
+}
+
+- (void)configurePlotRange {
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *)self.hostGraphView.hostedGraph.defaultPlotSpace;
-    NSDecimal xStart = [[NSDecimalNumber decimalNumberWithString:@"0"] decimalValue];
-    NSDecimal xLength = [[NSDecimalNumber decimalNumberWithString:@"8"] decimalValue];
-    NSDecimal yStart = [[NSDecimalNumber decimalNumberWithString:@"13.0"] decimalValue];
-    NSDecimal yLength = [[NSDecimalNumber decimalNumberWithString:@"17.0"] decimalValue];
-    [plotSpace setXRange:[CPTPlotRange plotRangeWithLocation:xStart length:xLength]];
-    [plotSpace setYRange:[CPTPlotRange plotRangeWithLocation:yStart length:yLength]];
+    CPTMutablePlotRange *xRange = plotSpace.xRange.mutableCopy;
+    CPTMutablePlotRange *yRange = plotSpace.yRange.mutableCopy;
+    NSDecimal xRangeDec = [[NSDecimalNumber numberWithDouble:20] decimalValue];
+    NSDecimal yRangeDec = [[NSDecimalNumber numberWithDouble:20] decimalValue];
+    [xRange setLength:xRangeDec];
+    [yRange setLength:yRangeDec];
+    plotSpace.xRange = xRange;
+    plotSpace.yRange = yRange;
 }
 
 - (NSUInteger)numberOfRecordsForPlot:(CPTPlot *)plot {
-    return 3;
+    return self.dataSource.count;
 }
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)index
 {
-    // We need to provide an X or Y (this method will be called for each) value for every index
-    int x = 2;
-    
-    // This method is actually called twice per point in the plot, one for the X and one for the Y value
-    if(fieldEnum == CPTScatterPlotFieldX)
-    {
-        // Return x value, which will, depending on index, be between -4 to 4
-        return [NSNumber numberWithInt: x];
+    NSDictionary *dataDic = [self.dataSource objectAtIndex:index];
+    if (fieldEnum == CPTScatterPlotFieldX) {
+        return [[dataDic allKeys] objectAtIndex:index];
     } else {
-        // Return y value, for this example we'll be plotting y = x * x
-        return [NSNumber numberWithInt: 15];
+        return [[dataDic allValues] objectAtIndex:index];
     }
+}
+
+-(NSString *)getSegmentKey {
+    NSString *key = [self.segmentControl titleForSegmentAtIndex:self.segmentControl.selectedSegmentIndex];
+    if ([key isEqualToString:@"Mon"]) {
+        return @"Monday";
+    } else if ([key isEqualToString:@"Tue"]) {
+        return @"Tuesday";
+    } else if ([key isEqualToString:@"Wed"]) {
+        return @"Wednesday";
+    } else if ([key isEqualToString:@"Thu"]) {
+        return @"Thursday";
+    } else if ([key isEqualToString:@"Fri"]) {
+        return @"Friday";
+    } else if ([key isEqualToString:@"Sat"]) {
+        return @"Saturday";
+    } else if ([key isEqualToString:@"Sun"]) {
+        return @"Sunday";
+    }
+    return @"";
 }
 
 /*

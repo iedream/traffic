@@ -314,9 +314,10 @@ NSMutableDictionary *currentDic;
 }
 
 - (IBAction)backToMap:(id)sender {
-    dataGraphViewController *dataGraphViewController = [self.storyboard instantiateViewControllerWithIdentifier:@"dataGraphViewController"];
-    [self addChildViewController:dataGraphViewController];
-    [self.view addSubview:dataGraphViewController.view];
+    dataGraphViewController *dataGraphViewCont= [self.storyboard instantiateViewControllerWithIdentifier:@"dataGraphViewController"];
+    [self addChildViewController:dataGraphViewCont];
+    [self.view addSubview:dataGraphViewCont.view];
+    [dataGraphViewCont setDataForGraph:currentDic[@"routeName"]];
 }
 
 - (IBAction)backToMainList:(id)sender {
@@ -328,31 +329,27 @@ NSMutableDictionary *currentDic;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basicPath = [paths firstObject];
     NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
-    [timeFormatter setDateFormat:@"HH:mm a"];
+    [timeFormatter setDateFormat:@"hh:mm a"];
     NSDateFormatter *weekFormatter = [[NSDateFormatter alloc] init];
     [weekFormatter setDateFormat: @"EEEE"];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat: @"yyyy-MM-dd"];
     
 
     for (NSDictionary *dict in routeArr) {
         NSString *routeName = dict[@"routeName"];
         NSString *routePath = [basicPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", routeName]];
-        NSMutableDictionary *timeDic = [[NSMutableDictionary alloc]init];
+        NSMutableArray *timeDic = [[NSMutableArray alloc]init];
         if ([[NSFileManager defaultManager]fileExistsAtPath:routePath]) {
-            timeDic = [[NSMutableDictionary alloc] initWithContentsOfFile:routePath];
+            timeDic = [[NSMutableArray alloc] initWithContentsOfFile:routePath];
         } else {
-            timeDic = [[NSMutableDictionary alloc]init];
+            timeDic = [[NSMutableArray alloc]init];
         }
         [self getTrafficTimeWithAppleMap:dict completionHandler:^(double trafficTime) {
             completionBlock(@"success");
             if (trafficTime) {
                 NSString *timeString = [timeFormatter stringFromDate:[NSDate date]];
                 NSString *weekString = [[weekFormatter stringFromDate:[NSDate date]] capitalizedString];
-                NSString *dateString = [dateFormatter stringFromDate:[NSDate date]];
-                NSString *key = [NSString stringWithFormat:@"%@,%@", dateString, timeString];
                 NSDictionary *dict = @{@"trafficTime":@(trafficTime), @"time":timeString, @"weekday":weekString};
-                [timeDic setObject:dict forKey:key];
+                [timeDic addObject:dict];
                 [timeDic writeToFile:routePath atomically:NO];
             }
         }];

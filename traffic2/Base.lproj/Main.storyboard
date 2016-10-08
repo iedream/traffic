@@ -673,7 +673,7 @@
         <!--Data Graph View Controller-->
         <scene sceneID="Ikn-m6-RjK">
             <objects>
-                <viewController storyboardIdentifier="dataGraphViewController" id="43c-p0-Ypo" customClass="dataGraphViewController" sceneMemberID="viewController">
+                <viewController restorationIdentifier="dataGraphViewController" storyboardIdentifier="dataGraphViewController" id="43c-p0-Ypo" customClass="dataGraphViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="K8c-bT-jAH"/>
                         <viewControllerLayoutGuide type="bottom" id="Slr-oP-ppa"/>
@@ -681,8 +681,39 @@
                     <view key="view" contentMode="scaleToFill" id="gbn-LJ-duH">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kde-3R-zO0">
+                                <rect key="frame" x="0.0" y="97" width="600" height="503"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </view>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="fXQ-JZ-Fjo">
+                                <rect key="frame" x="26" y="28" width="554" height="29"/>
+                                <segments>
+                                    <segment title="Mon"/>
+                                    <segment title="Tue"/>
+                                    <segment title="Wed"/>
+                                    <segment title="Thu"/>
+                                    <segment title="Fri"/>
+                                    <segment title="Sat"/>
+                                    <segment title="Sun"/>
+                                </segments>
+                            </segmentedControl>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="kde-3R-zO0" firstAttribute="top" secondItem="fXQ-JZ-Fjo" secondAttribute="bottom" constant="20" id="Ikd-SX-VIW"/>
+                            <constraint firstItem="Slr-oP-ppa" firstAttribute="top" secondItem="kde-3R-zO0" secondAttribute="bottom" constant="10" id="MpJ-VN-NHG"/>
+                            <constraint firstItem="kde-3R-zO0" firstAttribute="leading" secondItem="gbn-LJ-duH" secondAttribute="leading" constant="10" id="NgA-ZG-YkP"/>
+                            <constraint firstAttribute="trailing" secondItem="kde-3R-zO0" secondAttribute="trailing" constant="10" id="Og7-m7-XP5"/>
+                            <constraint firstAttribute="trailing" secondItem="fXQ-JZ-Fjo" secondAttribute="trailing" constant="20" id="SQ6-is-BqE"/>
+                            <constraint firstItem="fXQ-JZ-Fjo" firstAttribute="top" secondItem="K8c-bT-jAH" secondAttribute="bottom" constant="20" id="XsH-Og-wA1"/>
+                            <constraint firstItem="fXQ-JZ-Fjo" firstAttribute="leading" secondItem="gbn-LJ-duH" secondAttribute="leading" constant="20" id="ddl-6s-EhK"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="hostGraphView" destination="kde-3R-zO0" id="K8s-YM-Kio"/>
+                        <outlet property="segmentControl" destination="fXQ-JZ-Fjo" id="jdR-UF-FTU"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XKN-uj-nnk" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
