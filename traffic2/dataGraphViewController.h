@@ -18,6 +18,7 @@ typedef enum {
 @interface dataGraphViewController : UIViewController <CPTBarPlotDataSource, CPTBarPlotDelegate>
 @property (strong, nonatomic) IBOutlet CPTGraphHostingView *hostGraphView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentControl;
+@property (weak, nonatomic) IBOutlet UIButton *backButton;
 @property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) NSDictionary *allDataDic;
 @property (nonatomic) TimeCase currentCase;

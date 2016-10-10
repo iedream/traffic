@@ -19,12 +19,15 @@ const NSString *plotIdentifier = @"TrafficData";
 - (void)viewDidLoad {
     [super viewDidLoad];
     CGRect frame;
-    frame.origin.x = -10;
+    frame.origin.x = 0;
     frame.origin.y = CGRectGetMaxY(self.segmentControl.bounds) + 40;
     frame.size.width = self.view.bounds.size.width;
-    frame.size.height = self.view.bounds.size.height - frame.origin.y - 60;
+    frame.size.height = self.view.bounds.size.height - frame.origin.y;
     self.hostGraphView = [[CPTGraphHostingView alloc]initWithFrame:frame];
     [self.view addSubview:self.hostGraphView];
+    
+    [self.backButton setUserInteractionEnabled:YES];
+    [self.view bringSubviewToFront:self.backButton];
     
     [self configurePlot];
     // Do any additional setup after loading the view.
@@ -185,22 +188,28 @@ const NSString *plotIdentifier = @"TrafficData";
     [textStyle setFontSize:12.0f];
     [textStyle setColor:[CPTColor colorWithCGColor:[[UIColor grayColor] CGColor]]];
     
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    [formatter setGeneratesDecimalNumbers:NO];
+    [formatter setNumberStyle:NSNumberFormatterDecimalStyle];
+    
     CPTXYAxisSet *axesSet = (CPTXYAxisSet*)[self.hostGraphView.hostedGraph axisSet];
     CPTXYAxis *xAxis = [axesSet xAxis];
     [xAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
     [xAxis setMinorTicksPerInterval:4];
     [xAxis setLabelingPolicy:CPTAxisLabelingPolicyFixedInterval];
     [xAxis setLabelTextStyle:textStyle];
-    CPTXYAxis *yAxis = [axesSet yAxis];
+    xAxis.labelFormatter = formatter;
+    xAxis.title = @"Time (24 hour clock)";
     
+    CPTXYAxis *yAxis = [axesSet yAxis];
     if (self.currentCase == DAY) {
         maxRange = maxRange / 60;
         [yAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
         [yAxis setMinorTicksPerInterval:4];
     } else if (self.currentCase == HOUR) {
-        maxRange = maxRange / 60;
-        [yAxis setMajorIntervalLength:CPTDecimalFromInt(50)];
-        [yAxis setMinorTicksPerInterval:4];
+        maxRange = maxRange;
+        [yAxis setMajorIntervalLength:CPTDecimalFromInt(30)];
+        [yAxis setMinorTicksPerInterval:2];
     } else if (self.currentCase == MINUTE) {
         maxRange = 10;
         [yAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
@@ -208,13 +217,23 @@ const NSString *plotIdentifier = @"TrafficData";
     }
     [yAxis setLabelingPolicy:CPTAxisLabelingPolicyFixedInterval];
     [yAxis setLabelTextStyle:textStyle];
-    
+    yAxis.labelFormatter = formatter;
+    if (self.currentCase == DAY) {
+        yAxis.title = @"Travel Time (hours)";
+    } else {
+        yAxis.title = @"Travel Time (minutes)";
+    }
     
     CPTXYPlotSpace *plotSpace = (CPTXYPlotSpace *)self.hostGraphView.hostedGraph.defaultPlotSpace;
     CPTMutablePlotRange *xRange = plotSpace.xRange.mutableCopy;
     CPTMutablePlotRange *yRange = plotSpace.yRange.mutableCopy;
     NSDecimal xRangeDec = [[NSDecimalNumber numberWithDouble:24] decimalValue];
-    NSDecimal yRangeDec = [[NSDecimalNumber numberWithDouble:maxRange] decimalValue];
+    NSDecimal yRangeDec;
+    if (self.currentCase == DAY) {
+        yRangeDec = [[NSDecimalNumber numberWithDouble:maxRange+5] decimalValue];
+    } else {
+        yRangeDec = [[NSDecimalNumber numberWithDouble:maxRange+10] decimalValue];
+    }
     [xRange setLength:xRangeDec];
     [yRange setLength:yRangeDec];
     plotSpace.xRange = xRange;
@@ -227,11 +246,6 @@ const NSString *plotIdentifier = @"TrafficData";
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)index
 {
-//    if (fieldEnum == CPTScatterPlotFieldX) {
-//        return @(index);
-//    } else {
-//        return @(index);
-//    }
     NSDictionary *dataDic = [self.dataSource objectAtIndex:index];
     if (fieldEnum == CPTScatterPlotFieldX) {
         int value = [[[dataDic allKeys] firstObject] intValue];
@@ -269,7 +283,7 @@ const NSString *plotIdentifier = @"TrafficData";
     self.currentAnnotation.contentLayer = textLayer;
     
     CGFloat x = (CGFloat)[[[[self.dataSource objectAtIndex:idx] allKeys] firstObject] intValue];
-    CGFloat y = (CGFloat)currentValue + 0.3;
+    CGFloat y = (CGFloat)currentValue + 1;
     self.currentAnnotation.anchorPlotPoint = @[@(x), @(y)];
     [self.hostGraphView.hostedGraph.plotAreaFrame.plotArea addAnnotation:self.currentAnnotation];
 }
@@ -296,6 +310,11 @@ const NSString *plotIdentifier = @"TrafficData";
 - (IBAction)segmentChanged:(id)sender {
     [self.currentAnnotation.annotationHostLayer removeAnnotation:self.currentAnnotation];
     [self setGraphData];
+}
+
+- (IBAction)back:(id)sender {
+    [self removeFromParentViewController];
+    [self.view removeFromSuperview];
 }
 
 /*

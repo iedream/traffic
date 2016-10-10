@@ -683,7 +683,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kde-3R-zO0">
-                                <rect key="frame" x="0.0" y="97" width="600" height="503"/>
+                                <rect key="frame" x="0.0" y="97" width="600" height="440"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="fXQ-JZ-Fjo">
@@ -701,19 +701,29 @@
                                     <action selector="segmentChanged:" destination="43c-p0-Ypo" eventType="valueChanged" id="BgU-N2-Vae"/>
                                 </connections>
                             </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lNI-pi-qNW">
+                                <rect key="frame" x="20" y="562" width="46" height="30"/>
+                                <state key="normal" title="Back"/>
+                                <connections>
+                                    <action selector="back:" destination="43c-p0-Ypo" eventType="touchUpInside" id="p1P-It-beK"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="Slr-oP-ppa" firstAttribute="top" secondItem="lNI-pi-qNW" secondAttribute="bottom" constant="10" id="6jw-Ux-GYd"/>
                             <constraint firstItem="kde-3R-zO0" firstAttribute="top" secondItem="fXQ-JZ-Fjo" secondAttribute="bottom" constant="20" id="Ikd-SX-VIW"/>
-                            <constraint firstItem="Slr-oP-ppa" firstAttribute="top" secondItem="kde-3R-zO0" secondAttribute="bottom" constant="10" id="MpJ-VN-NHG"/>
+                            <constraint firstItem="lNI-pi-qNW" firstAttribute="leading" secondItem="gbn-LJ-duH" secondAttribute="leading" constant="20" id="K1g-Oi-aWN"/>
                             <constraint firstItem="kde-3R-zO0" firstAttribute="leading" secondItem="gbn-LJ-duH" secondAttribute="leading" constant="10" id="NgA-ZG-YkP"/>
                             <constraint firstAttribute="trailing" secondItem="kde-3R-zO0" secondAttribute="trailing" constant="10" id="Og7-m7-XP5"/>
                             <constraint firstAttribute="trailing" secondItem="fXQ-JZ-Fjo" secondAttribute="trailing" constant="20" id="SQ6-is-BqE"/>
                             <constraint firstItem="fXQ-JZ-Fjo" firstAttribute="top" secondItem="K8c-bT-jAH" secondAttribute="bottom" constant="20" id="XsH-Og-wA1"/>
+                            <constraint firstItem="lNI-pi-qNW" firstAttribute="top" secondItem="kde-3R-zO0" secondAttribute="bottom" constant="10" id="chq-LZ-0lf"/>
                             <constraint firstItem="fXQ-JZ-Fjo" firstAttribute="leading" secondItem="gbn-LJ-duH" secondAttribute="leading" constant="20" id="ddl-6s-EhK"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="backButton" destination="lNI-pi-qNW" id="9Z3-RM-PRX"/>
                         <outlet property="hostGraphView" destination="kde-3R-zO0" id="K8s-YM-Kio"/>
                         <outlet property="segmentControl" destination="fXQ-JZ-Fjo" id="jdR-UF-FTU"/>
                     </connections>
