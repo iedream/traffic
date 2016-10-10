@@ -9,11 +9,18 @@
 #import <UIKit/UIKit.h>
 #import <CorePlot/ios/CorePlot.h>
 
+typedef enum {
+    MINUTE,
+    HOUR,
+    DAY
+}TimeCase;
+
 @interface dataGraphViewController : UIViewController <CPTBarPlotDataSource, CPTBarPlotDelegate>
 @property (strong, nonatomic) IBOutlet CPTGraphHostingView *hostGraphView;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentControl;
 @property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) NSDictionary *allDataDic;
+@property (nonatomic) TimeCase currentCase;
 
 - (void)setDataForGraph:(NSString *)routeName;
 

@@ -697,6 +697,9 @@
                                     <segment title="Sat"/>
                                     <segment title="Sun"/>
                                 </segments>
+                                <connections>
+                                    <action selector="segmentChanged:" destination="43c-p0-Ypo" eventType="valueChanged" id="BgU-N2-Vae"/>
+                                </connections>
                             </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>

@@ -32,7 +32,7 @@
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
     
     
-    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:1.0];
+    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
     return YES;
 }
 

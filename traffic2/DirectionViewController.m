@@ -32,8 +32,11 @@
         [self.congestionLabel setHidden:NO];
         [self.congestionText setHidden:NO];
         
-        [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%imin", bingPolyline.trafficTravelTime]];
-        [self.travelTimeText setText:[NSString stringWithFormat:@"%imin", bingPolyline.travelTime]];
+        if (bingPolyline.trafficTravelTime > 60) {
+            [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%.2fh", bingPolyline.trafficTravelTime/60.0]];
+        } else {
+            [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%imin", bingPolyline.trafficTravelTime]];
+        }
         
         [self.distanceText setText:[NSString stringWithFormat:@"%ikm", bingPolyline.distance]];
         
@@ -55,7 +58,11 @@
             [self.distanceText setText:[NSString stringWithFormat:@"%im", applePolyline.distance]];
         }
         
-        [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%imin", applePolyline.trafficTravelTime]];
+        if (applePolyline.trafficTravelTime > 60) {
+            [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%.2fh", applePolyline.trafficTravelTime/60.0]];
+        } else {
+            [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%imin", applePolyline.trafficTravelTime]];
+        }
     }
 }
 

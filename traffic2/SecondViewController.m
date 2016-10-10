@@ -63,7 +63,7 @@ NSMutableDictionary *currentDic;
     NSString *name = [[routeArr objectAtIndex:[routeArr indexOfObject:currentDic]] objectForKey:@"routeName"];
     name = [name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     
-    NSString *deviceToken = @"5060EABE8B8D552B1B06C7855E27B27EB2F1D9F8BDDC640BFE9765BBBD021C72";
+    NSString *deviceToken = @"6DFCD94F38953A47A1BFCD31726FECDDAFE6FFBC9FE6CF2E00282FD3D8F4D161";
     NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@,%@",deviceToken, name, clock, days];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"DELETE"];
@@ -77,7 +77,7 @@ NSMutableDictionary *currentDic;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Scheduling Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cancelling Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
                 
                 UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction * action){
@@ -95,7 +95,7 @@ NSMutableDictionary *currentDic;
 - (void)scheduleRemoteNotificationWithClock:(NSString*)clock days:(NSString*)days{
     NSString *zoneContinent = @"America";
     NSString *zoneCity = @"Toronto";
-    NSString *deviceToken = @"5060EABE8B8D552B1B06C7855E27B27EB2F1D9F8BDDC640BFE9765BBBD021C72";
+    NSString *deviceToken = @"6DFCD94F38953A47A1BFCD31726FECDDAFE6FFBC9FE6CF2E00282FD3D8F4D161";
     
     NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
     NSDictionary *dict = @{@"userInfo":currentDic, @"time":timeDict};
@@ -124,7 +124,7 @@ NSMutableDictionary *currentDic;
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&err];
             
             if ([httpResponse statusCode] == 200){
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cancel Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Scheduling Successful" message:json[@"message"] preferredStyle:UIAlertControllerStyleAlert];
                 
                 UIAlertAction* ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction * action){
@@ -298,7 +298,7 @@ NSMutableDictionary *currentDic;
         dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"6"];
     }
     if ([weekDaysDict[@"SUNDAY"] boolValue]) {
-        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"7"];
+        dateString = [NSString stringWithFormat:@"%@,%@", dateString, @"0"];
     }
     if (dateString.length > 1) {
         dateString = [dateString substringFromIndex:1];
@@ -329,7 +329,7 @@ NSMutableDictionary *currentDic;
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *basicPath = [paths firstObject];
     NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
-    [timeFormatter setDateFormat:@"hh:mm a"];
+    [timeFormatter setDateFormat:@"HH:mm a"];
     NSDateFormatter *weekFormatter = [[NSDateFormatter alloc] init];
     [weekFormatter setDateFormat: @"EEEE"];
     
