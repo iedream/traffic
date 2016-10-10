@@ -144,6 +144,7 @@ const NSString *plotIdentifier = @"TrafficData";
     
     CPTBarPlot *plot = [[CPTBarPlot alloc] initWithFrame:self.hostGraphView.hostedGraph.bounds];
     plot.dataSource = self;
+    plot.delegate = self;
     plot.identifier = @"TrafficData";
     [graph addPlot:plot];
     
@@ -239,6 +240,27 @@ const NSString *plotIdentifier = @"TrafficData";
         }
         return @(value);
     }
+}
+
+- (void)barPlot:(CPTBarPlot *)plot barWasSelectedAtRecordIndex:(NSUInteger)idx withEvent:(CPTNativeEvent *)event {
+    CPTMutableTextStyle *textStyle = [[CPTMutableTextStyle alloc]init];
+    textStyle.fontName = @"HelveticaNeue-Bold";
+    textStyle.fontSize = 12;
+    
+    int currentValue = [[[[self.dataSource objectAtIndex:idx] allValues] firstObject] intValue];
+    if (self.currentCase == DAY) {
+        currentValue = currentValue / 60;
+    }
+    NSString *currentValueString = [NSString stringWithFormat:@"%i", currentValue];
+    [self.currentAnnotation.annotationHostLayer removeAnnotation:self.currentAnnotation];
+    self.currentAnnotation = [[CPTPlotSpaceAnnotation alloc] initWithPlotSpace:plot.plotSpace anchorPlotPoint:@[@0,@0]];
+    CPTTextLayer *textLayer = [[CPTTextLayer alloc] initWithText:currentValueString style:textStyle];
+    self.currentAnnotation.contentLayer = textLayer;
+    
+    CGFloat x = (CGFloat)[[[[self.dataSource objectAtIndex:idx] allKeys] firstObject] intValue];
+    CGFloat y = (CGFloat)currentValue + 0.05;
+    self.currentAnnotation.anchorPlotPoint = @[@(x), @(y)];
+    [self.hostGraphView.hostedGraph.plotAreaFrame.plotArea addAnnotation:self.currentAnnotation];
 }
 
 -(NSString *)getSegmentKey {

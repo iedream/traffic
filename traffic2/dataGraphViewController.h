@@ -21,6 +21,7 @@ typedef enum {
 @property (nonatomic, strong) NSArray *dataSource;
 @property (nonatomic, strong) NSDictionary *allDataDic;
 @property (nonatomic) TimeCase currentCase;
+@property (nonatomic, strong) CPTPlotSpaceAnnotation *currentAnnotation;
 
 - (void)setDataForGraph:(NSString *)routeName;
 
