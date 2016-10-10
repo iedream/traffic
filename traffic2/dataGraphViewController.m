@@ -54,6 +54,8 @@ const NSString *plotIdentifier = @"TrafficData";
     self.dataSource = [self.allDataDic objectForKey:[self getSegmentKey]];
     CPTPlot *plot = [self.hostGraphView.hostedGraph plotWithIdentifier:plotIdentifier];
     [self configurePlotDetail];
+    [plot setDelegate:self];
+    [plot setDataSource:self];
     [plot reloadData];
 }
 
@@ -132,15 +134,10 @@ const NSString *plotIdentifier = @"TrafficData";
 }
 
 - (void)configurePlot {
+    
     CPTXYGraph *graph = [[CPTXYGraph alloc]initWithFrame:CGRectZero];
     graph.title = @"Traffic Data";
     self.hostGraphView.hostedGraph = graph;
-
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingLeft:50.0f];
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingTop:10.0f];
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingBottom:120.0f];
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingRight:20.0f];
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setBorderLineStyle:nil];
     
     CPTBarPlot *plot = [[CPTBarPlot alloc] initWithFrame:self.hostGraphView.hostedGraph.bounds];
     plot.dataSource = self;
@@ -148,8 +145,11 @@ const NSString *plotIdentifier = @"TrafficData";
     plot.identifier = @"TrafficData";
     [graph addPlot:plot];
     
-    plot.barWidth = [[NSDecimalNumber numberWithDouble:0.5] decimalValue];
-    plot.barOffset = [[NSDecimalNumber numberWithDouble:0.25] decimalValue];
+    [[graph plotAreaFrame] setPaddingLeft:40.0f];
+    [[graph plotAreaFrame] setPaddingTop:10.0f];
+    [[graph plotAreaFrame] setPaddingBottom:120.0f];
+    [[graph plotAreaFrame] setPaddingRight:0.0f];
+    [[graph plotAreaFrame] setBorderLineStyle:nil];
 }
 
 - (int)getPlotRange {
@@ -178,7 +178,7 @@ const NSString *plotIdentifier = @"TrafficData";
     [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingLeft:50.0f];
     [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingTop:10.0f];
     [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingBottom:120.0f];
-    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingRight:0.0f];
+    [[self.hostGraphView.hostedGraph plotAreaFrame] setPaddingRight:10.0f];
     [[self.hostGraphView.hostedGraph plotAreaFrame] setBorderLineStyle:nil];
     
     CPTMutableTextStyle *textStyle = [CPTMutableTextStyle textStyle];
@@ -188,7 +188,7 @@ const NSString *plotIdentifier = @"TrafficData";
     CPTXYAxisSet *axesSet = (CPTXYAxisSet*)[self.hostGraphView.hostedGraph axisSet];
     CPTXYAxis *xAxis = [axesSet xAxis];
     [xAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
-    [xAxis setMinorTicksPerInterval:5];
+    [xAxis setMinorTicksPerInterval:4];
     [xAxis setLabelingPolicy:CPTAxisLabelingPolicyFixedInterval];
     [xAxis setLabelTextStyle:textStyle];
     CPTXYAxis *yAxis = [axesSet yAxis];
@@ -196,15 +196,15 @@ const NSString *plotIdentifier = @"TrafficData";
     if (self.currentCase == DAY) {
         maxRange = maxRange / 60;
         [yAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
-        [yAxis setMinorTicksPerInterval:5];
+        [yAxis setMinorTicksPerInterval:4];
     } else if (self.currentCase == HOUR) {
         maxRange = maxRange / 60;
-        [yAxis setMajorIntervalLength:CPTDecimalFromInt(30)];
-        [yAxis setMinorTicksPerInterval:10];
+        [yAxis setMajorIntervalLength:CPTDecimalFromInt(50)];
+        [yAxis setMinorTicksPerInterval:4];
     } else if (self.currentCase == MINUTE) {
         maxRange = 10;
-        [yAxis setMajorIntervalLength:CPTDecimalFromInt(10)];
-        [yAxis setMinorTickLength:2];
+        [yAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
+        [yAxis setMinorTicksPerInterval:4];
     }
     [yAxis setLabelingPolicy:CPTAxisLabelingPolicyFixedInterval];
     [yAxis setLabelTextStyle:textStyle];
@@ -227,6 +227,11 @@ const NSString *plotIdentifier = @"TrafficData";
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)index
 {
+//    if (fieldEnum == CPTScatterPlotFieldX) {
+//        return @(index);
+//    } else {
+//        return @(index);
+//    }
     NSDictionary *dataDic = [self.dataSource objectAtIndex:index];
     if (fieldEnum == CPTScatterPlotFieldX) {
         int value = [[[dataDic allKeys] firstObject] intValue];
@@ -251,14 +256,20 @@ const NSString *plotIdentifier = @"TrafficData";
     if (self.currentCase == DAY) {
         currentValue = currentValue / 60;
     }
-    NSString *currentValueString = [NSString stringWithFormat:@"%i", currentValue];
+    
+    NSString *currentValueString;
+    if (self.currentCase == DAY) {
+        currentValueString = [NSString stringWithFormat:@"%ih", currentValue];
+    } else {
+        currentValueString = [NSString stringWithFormat:@"%imin", currentValue];
+    }
     [self.currentAnnotation.annotationHostLayer removeAnnotation:self.currentAnnotation];
     self.currentAnnotation = [[CPTPlotSpaceAnnotation alloc] initWithPlotSpace:plot.plotSpace anchorPlotPoint:@[@0,@0]];
     CPTTextLayer *textLayer = [[CPTTextLayer alloc] initWithText:currentValueString style:textStyle];
     self.currentAnnotation.contentLayer = textLayer;
     
     CGFloat x = (CGFloat)[[[[self.dataSource objectAtIndex:idx] allKeys] firstObject] intValue];
-    CGFloat y = (CGFloat)currentValue + 0.05;
+    CGFloat y = (CGFloat)currentValue + 0.3;
     self.currentAnnotation.anchorPlotPoint = @[@(x), @(y)];
     [self.hostGraphView.hostedGraph.plotAreaFrame.plotArea addAnnotation:self.currentAnnotation];
 }
@@ -283,6 +294,7 @@ const NSString *plotIdentifier = @"TrafficData";
     return @"";
 }
 - (IBAction)segmentChanged:(id)sender {
+    [self.currentAnnotation.annotationHostLayer removeAnnotation:self.currentAnnotation];
     [self setGraphData];
 }
 
