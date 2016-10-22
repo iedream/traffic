@@ -17,6 +17,7 @@
 @property (nonatomic, strong) NSMutableArray *myRouteData;
 @property (nonatomic, strong) NSArray *weekDaydata;
 
+@property (nonatomic)int currentDataIndex;
 
 +(SecondViewController*)sharedInstance;
 -(NSMutableDictionary*)addWithBingDirection:(BingPolyLine*)route;

@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TrafficRouteViewController : UIViewController
+@interface TrafficRouteViewController : UIViewController <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *severityTextField;
 @property (weak, nonatomic) IBOutlet UITextField *typeTextField;
 @property (weak, nonatomic) IBOutlet UITextField *roadClosedTextField;

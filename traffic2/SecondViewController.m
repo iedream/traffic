@@ -333,8 +333,11 @@ NSMutableDictionary *currentDic;
     NSDateFormatter *weekFormatter = [[NSDateFormatter alloc] init];
     [weekFormatter setDateFormat: @"EEEE"];
     
-
-    for (NSDictionary *dict in routeArr) {
+    NSDictionary *dict = [routeArr objectAtIndex:self.currentDataIndex];
+    self.currentDataIndex += 1;
+    if (self.currentDataIndex >= routeArr.count) {
+        self.currentDataIndex = 0;
+    }
         NSString *routeName = dict[@"routeName"];
         NSString *routePath = [basicPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.plist", routeName]];
         NSMutableArray *timeDic = [[NSMutableArray alloc]init];
@@ -353,7 +356,6 @@ NSMutableDictionary *currentDic;
                 [timeDic writeToFile:routePath atomically:NO];
             }
         }];
-    }
 }
 
 #pragma mark LocationManager Delegate Method
