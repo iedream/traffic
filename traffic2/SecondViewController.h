@@ -19,6 +19,8 @@
 
 @property (nonatomic)int currentDataIndex;
 
+@property (nonatomic, strong) NSString *deviceId;
+
 +(SecondViewController*)sharedInstance;
 -(NSMutableDictionary*)addWithBingDirection:(BingPolyLine*)route;
 -(NSMutableDictionary*)addWithAppleDirection:(ApplePolyLine*)route;

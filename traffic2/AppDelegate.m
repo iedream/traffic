@@ -62,7 +62,9 @@
     for (NSUInteger i = 0; i < [deviceToken length]; i++) {
         [token appendFormat:@"%02.2hhX", data[i]];
     }
-    NSLog(token);
+    UINavigationController *navCon = (UINavigationController *)self.window.rootViewController;
+    SecondViewController *secondViewCon = navCon.viewControllers[1];
+    secondViewCon.deviceId = token;
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {

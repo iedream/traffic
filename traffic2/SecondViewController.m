@@ -63,8 +63,7 @@ NSMutableDictionary *currentDic;
     NSString *name = [[routeArr objectAtIndex:[routeArr indexOfObject:currentDic]] objectForKey:@"routeName"];
     name = [name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     
-    NSString *deviceToken = @"6DFCD94F38953A47A1BFCD31726FECDDAFE6FFBC9FE6CF2E00282FD3D8F4D161";
-    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@,%@",deviceToken, name, clock, days];
+    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@,%@",self.deviceId, name, clock, days];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"DELETE"];
     
@@ -95,7 +94,6 @@ NSMutableDictionary *currentDic;
 - (void)scheduleRemoteNotificationWithClock:(NSString*)clock days:(NSString*)days{
     NSString *zoneContinent = @"America";
     NSString *zoneCity = @"Toronto";
-    NSString *deviceToken = @"6DFCD94F38953A47A1BFCD31726FECDDAFE6FFBC9FE6CF2E00282FD3D8F4D161";
     
     NSDictionary *timeDict = @{@"clock":clock, @"days":days, @"continent":zoneContinent, @"city":zoneCity};
     NSDictionary *dict = @{@"userInfo":currentDic, @"time":timeDict};
@@ -107,7 +105,7 @@ NSMutableDictionary *currentDic;
     NSString *requestJson = [[NSString alloc] initWithData:stringDict encoding:NSUTF8StringEncoding];
     NSData *requestData = [requestJson dataUsingEncoding:NSUTF8StringEncoding];
 
-    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/sendNotification/%@",deviceToken];
+    NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/sendNotification/%@",self.deviceId];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:baseUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:40.0];
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
