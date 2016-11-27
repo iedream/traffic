@@ -68,6 +68,8 @@ NSMutableDictionary *labelDic;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveAroundRouteTrafficNotification:) name:@"GetAroundRouteTrafficData" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receiveDirectionNotification:) name:@"GetDirectionData" object:nil];
     
+    self.searchText.delegate = self;
+    
 }
 
 #pragma mark GestureRecognizer Delegate Method
@@ -396,30 +398,37 @@ NSMutableDictionary *labelDic;
 
 #pragma mark Notification Receiver Method
 
-- (void)receivePointTrafficNotification:(NSNotification *)notif {
-    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.userInfo[@"longitude"] doubleValue]);
+- (void)clearMapView {
+    for (NSObject *subView in self.mapView.subviews) {
+        if ([subView isKindOfClass:[UILabel class]]) {
+            UILabel *label = (UILabel *)subView;
+            [label removeFromSuperview];
+        }
+    }
     NSArray *pointsArray = [self.mapView overlays];
     [self.mapView removeOverlays:pointsArray];
+}
+
+- (void)receivePointTrafficNotification:(NSNotification *)notif {
+    [self clearMapView];
+    CLLocationCoordinate2D currentP = CLLocationCoordinate2DMake([notif.userInfo[@"latitude"] doubleValue], [notif.userInfo[@"longitude"] doubleValue]);
     [self downloadAccident:[self createTrafficStringFromPoint:currentP]];
 }
 
 - (void)receiveOnRouteTrafficNotification:(NSNotification *)notif {
+    [self clearMapView];
     MKPolyline *polyLine = notif.userInfo[@"polyLine"];
-    NSArray *pointsArray = [self.mapView overlays];
-    [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:NO]];
 }
 
 - (void)receiveAroundRouteTrafficNotification:(NSNotification *)notif {
+    [self clearMapView];
     MKPolyline *polyLine = notif.userInfo[@"polyLine"];
-    NSArray *pointsArray = [self.mapView overlays];
-    [self.mapView removeOverlays:pointsArray];
     [self downloadAccident:[self createTrafficStringFromPolyline:polyLine inRange:YES]];
 }
 
 - (void)receiveDirectionNotification:(NSNotification *)notif{
-    NSArray *pointsArray = [self.mapView overlays];
-    [self.mapView removeOverlays:pointsArray];
+    [self clearMapView];
     
     NSString *startString = notif.userInfo[@"start"];
     NSString *endString = notif.userInfo[@"end"];
@@ -692,6 +701,15 @@ NSMutableDictionary *labelDic;
     
     // Dispose of any resources that can be recreated.
     
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (void) touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+    [[self view] endEditing:YES];
 }
 
 

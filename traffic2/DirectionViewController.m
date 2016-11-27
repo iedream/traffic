@@ -38,6 +38,12 @@
             [self.trafficTravelTimeText setText:[NSString stringWithFormat:@"%imin", bingPolyline.trafficTravelTime]];
         }
         
+        if (bingPolyline.travelTime > 60) {
+            [self.travelTimeText setText:[NSString stringWithFormat:@"%.2fh", bingPolyline.travelTime/60.0]];
+        } else {
+            [self.travelTimeText setText:[NSString stringWithFormat:@"%imin", bingPolyline.travelTime]];
+        }
+        
         [self.distanceText setText:[NSString stringWithFormat:@"%ikm", bingPolyline.distance]];
         
         [self.congestionText setText:bingPolyline.congestion];
@@ -111,6 +117,7 @@
                           self.polyLine, @"polyLine",
                           nil];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetOnRouteTrafficData" object:nil userInfo:dict];
+    [self back:nil];
 }
 
 - (IBAction)trafficAroundRoute:(id)sender {
@@ -118,6 +125,7 @@
                           self.polyLine, @"polyLine",
                           nil];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"GetAroundRouteTrafficData" object:nil userInfo:dict];
+    [self back:nil];
 }
 
 - (IBAction)addRoute:(id)sender {

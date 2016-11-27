@@ -12,7 +12,7 @@
 #import "MyAnnotation.h"
 #import "TrafficRouteViewController.h"
 
-@interface FirstViewController : UIViewController<CLLocationManagerDelegate,MKMapViewDelegate, MKAnnotation, UIGestureRecognizerDelegate>
+@interface FirstViewController : UIViewController<CLLocationManagerDelegate,MKMapViewDelegate, MKAnnotation, UIGestureRecognizerDelegate, UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 - (void)directionWithAppleMap:(MKPlacemark *)startPlaceMark endPlaceMark:(MKPlacemark *)endPlaceMark;
 @end

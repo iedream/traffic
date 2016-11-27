@@ -84,8 +84,8 @@
                                                            [alert dismissViewControllerAnimated:YES completion:NULL];
                                                        }];
             [alert addAction:ok];
-            [secondViewCon presentViewController:alert animated:YES completion:NULL];
-            application.applicationIconBadgeNumber = 0;
+            UIViewController *vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+            [vc presentViewController:alert animated:YES completion:nil];
             completionHandler(UIBackgroundFetchResultNewData);
         }else {
             completionHandler(UIBackgroundFetchResultNewData);
