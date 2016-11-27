@@ -94,7 +94,7 @@
             localNotification.fireDate = [NSDate date];
             localNotification.soundName = @"ping.aiff";
             localNotification.alertTitle = [NSString stringWithFormat:@"%@ Route", userInfo[@"name"]];
-            localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time:%imin for Route %@", (int)trafficTime, userInfo[@"name"]];
+            localNotification.alertBody = [NSString stringWithFormat:@"Current Traffic Time: %imin for Route %@", (int)trafficTime, userInfo[@"routeName"]];
             [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
         }
     }];
