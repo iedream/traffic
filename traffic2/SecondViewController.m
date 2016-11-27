@@ -60,7 +60,7 @@ NSMutableDictionary *currentDic;
 
 - (void)removeNotificationWithClock:(NSString*)clock days:(NSString*)days {
     clock = [clock stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
-    NSString *name = [[routeArr objectAtIndex:[routeArr indexOfObject:currentDic]] objectForKey:@"routeName"];
+    NSString *name = [currentDic objectForKey:@"routeName"];
     name = [name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
     
     NSString *baseUrl = [NSString stringWithFormat:@"http://trafficpushserver.herokuapp.com/cancelNotification/%@/%@/%@,%@",self.deviceId, name, clock, days];
@@ -259,7 +259,19 @@ NSMutableDictionary *currentDic;
     [routeArr writeToFile:path atomically:YES];
 }
 
+- (void)noRouteError {
+    UIAlertController *routeSelectionError = [UIAlertController alertControllerWithTitle:@"No Route Found" message:@"Please select a route first" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil];
+    [routeSelectionError addAction:okAction];
+    [self presentViewController:routeSelectionError animated:true completion:nil];
+}
+
 - (IBAction)addWatchTime:(id)sender {
+    if (!currentDic) {
+        [self noRouteError];
+        return;
+    }
+    
     NSDateFormatter *outputFormatter = [[NSDateFormatter alloc] init];
     [outputFormatter setDateFormat:@"HH:mm a"];
     NSString *time = [outputFormatter stringFromDate:self.timePicker.date];
@@ -305,6 +317,11 @@ NSMutableDictionary *currentDic;
 }
 
 - (void)cancelAllNotif {
+    if (!currentDic) {
+        [self noRouteError];
+        return;
+    }
+    
     NSArray *notif = currentDic[@"notification"];
     for (NSArray *arr in notif) {
         [self removeNotificationWithClock:[arr firstObject] days:[arr lastObject]];
@@ -312,6 +329,11 @@ NSMutableDictionary *currentDic;
 }
 
 - (IBAction)backToMap:(id)sender {
+    if (!currentDic) {
+        [self noRouteError];
+        return;
+    }
+    
     dataGraphViewController *dataGraphViewCont= [self.storyboard instantiateViewControllerWithIdentifier:@"dataGraphViewController"];
     [self addChildViewController:dataGraphViewCont];
     [self.view addSubview:dataGraphViewCont.view];
@@ -320,6 +342,7 @@ NSMutableDictionary *currentDic;
 
 - (IBAction)backToMainList:(id)sender {
     self.myRouteData = routeArr;
+    currentDic = nil;
     [self.myRouteTable reloadData];
 }
 
@@ -417,6 +440,7 @@ NSMutableDictionary *currentDic;
             [self writeToPlist];
             [self.myRouteTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
         } else if (tableView == self.myRouteTable && self.myRouteData == routeArr) {
+            currentDic = [self.myRouteData objectAtIndex:indexPath.row];
             [self cancelAllNotif];
             [self.myRouteData removeObjectAtIndex:indexPath.row];
             [self writeToPlist];

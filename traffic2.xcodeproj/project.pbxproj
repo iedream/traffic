@@ -54,6 +54,7 @@
 		0EC87CFEED8F53387008B00B /* Pods-traffic2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-traffic2.release.xcconfig"; path = "Pods/Target Support Files/Pods-traffic2/Pods-traffic2.release.xcconfig"; sourceTree = "<group>"; };
 		4F64B3711DA73C26005EF7B7 /* dataGraphViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dataGraphViewController.h; sourceTree = "<group>"; };
 		4F64B3721DA73C26005EF7B7 /* dataGraphViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = dataGraphViewController.m; sourceTree = "<group>"; };
+		4F7113801DEA6DA200A6C4EE /* traffic2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = traffic2.entitlements; sourceTree = "<group>"; };
 		4F756B621D86458D00C6DE47 /* MyAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyAnnotation.h; sourceTree = "<group>"; };
 		4F756B631D86458D00C6DE47 /* MyAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyAnnotation.m; sourceTree = "<group>"; };
 		4F9E428C1D80F1D70046B346 /* AddressDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddressDetailViewController.h; sourceTree = "<group>"; };
@@ -156,6 +157,7 @@
 		4FDB6BFF1D78EAF200B668EE /* traffic2 */ = {
 			isa = PBXGroup;
 			children = (
+				4F7113801DEA6DA200A6C4EE /* traffic2.entitlements */,
 				4F64B3711DA73C26005EF7B7 /* dataGraphViewController.h */,
 				4F64B3721DA73C26005EF7B7 /* dataGraphViewController.m */,
 				4FD52D9F1DA3526C00A736AA /* WeekDayTableViewCell.h */,
@@ -660,6 +662,7 @@
 			baseConfigurationReference = 0B558B8FF4C6C2E1694ECCEC /* Pods-traffic2.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = traffic2/traffic2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = traffic2/Info.plist;
@@ -675,6 +678,7 @@
 			baseConfigurationReference = 0EC87CFEED8F53387008B00B /* Pods-traffic2.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = traffic2/traffic2.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = traffic2/Info.plist;

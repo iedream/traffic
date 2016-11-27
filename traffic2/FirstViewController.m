@@ -604,7 +604,7 @@ NSMutableDictionary *labelDic;
 }
 
 - (NSString *)createTrafficStringFromPoint:(CLLocationCoordinate2D )address {
-    NSString *addressLine =  [NSString stringWithFormat:@"%f,%f,%f,%f", (int)address.latitude-0.5, (int)address.longitude-0.5, (int)address.latitude+0.5, (int)address.longitude+0.5];
+    NSString *addressLine =  [NSString stringWithFormat:@"%f,%f,%f,%f", address.latitude-0.5, address.longitude-0.5, address.latitude+0.5, address.longitude+0.5];
     return addressLine;
 }
 
