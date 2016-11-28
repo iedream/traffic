@@ -210,7 +210,7 @@ const NSString *plotIdentifier = @"TrafficData";
         maxRange = maxRange;
         [yAxis setMajorIntervalLength:CPTDecimalFromInt(30)];
         [yAxis setMinorTicksPerInterval:2];
-    } else if (self.currentCase == MINUTE) {
+    } else if (self.currentCase == MINUTE && maxRange < 10) {
         maxRange = 10;
         [yAxis setMajorIntervalLength:CPTDecimalFromInt(5)];
         [yAxis setMinorTicksPerInterval:4];

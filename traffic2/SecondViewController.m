@@ -159,7 +159,7 @@ NSMutableDictionary *currentDic;
     } else if ([polyline isKindOfClass:[BingPolyLine class]]) {
         BingPolyLine *applyLine = (BingPolyLine *)polyline;
         dict = [self addWithBingDirection:applyLine];
-        dict[@"routenName"] = name;
+        dict[@"routeName"] = name;
         [self convertlocationIntoString:applyLine.source completionHandler:^(NSString *sourceString) {
             [self convertlocationIntoString:applyLine.dest completionHandler:^(NSString *destString) {
                 dict[@"sourceString"] = sourceString;
@@ -191,10 +191,12 @@ NSMutableDictionary *currentDic;
     [dict setValue:[NSNumber numberWithDouble:route.distance] forKey:@"distance"];
     [dict setValue:[NSNumber numberWithInt:route.trafficTravelTime] forKey:@"expectedTime"];
     [dict setValue:[NSNumber numberWithDouble:route.travelTime] forKey:@"actTime"];
+    [dict setValue:route.name forKey:@"name"];
     NSDictionary *startDic = @{@"latitude":[NSNumber numberWithDouble:route.source.latitude], @"longitude":[NSNumber numberWithDouble:route.source.longitude]};
     [dict setValue:startDic forKey:@"source"];
     NSDictionary *endDic = @{@"latitude":[NSNumber numberWithDouble:route.dest.latitude], @"longitude":[NSNumber numberWithDouble:route.dest.longitude]};
     [dict setValue:endDic forKey:@"end"];
+    [dict setValue:@"Bing" forKey:@"type"];
     return dict;
 }
 
@@ -230,7 +232,8 @@ NSMutableDictionary *currentDic;
         request.destination = endItem;
         request.requestsAlternateRoutes = true;
         request.transportType = MKDirectionsTransportTypeAutomobile;
-    [self getAppleDirectionWithRequest:request name:userInfo[@"name"] completionBlock:^(double trafficTime) {
+    NSString *routeName = [userInfo[@"type"] isEqualToString:@"Apple"] ? userInfo[@"name"] : nil;
+    [self getAppleDirectionWithRequest:request name:routeName completionBlock:^(double trafficTime) {
         completionBlock(trafficTime);
     }];
 }
@@ -239,6 +242,10 @@ NSMutableDictionary *currentDic;
     MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
     [directions calculateDirectionsWithCompletionHandler:^(MKDirectionsResponse *response, NSError *err){
         if (!err) {
+            if (!name) {
+                int time = response.routes.firstObject.expectedTravelTime/60;
+                completionBlock(time);
+            }
             BOOL returnVar = false;
             for(MKRoute *route in response.routes) {
                 if ([route.name isEqualToString: name]) {
@@ -251,7 +258,9 @@ NSMutableDictionary *currentDic;
             if (!returnVar) {
                 [self getAppleDirectionWithRequest:request name:name completionBlock:completionBlock];
             }
-        };
+        } else {
+            return completionBlock(-1);
+        }
     }];
 }
 
@@ -368,14 +377,14 @@ NSMutableDictionary *currentDic;
             timeDic = [[NSMutableArray alloc]init];
         }
         [self getTrafficTimeWithAppleMap:dict completionHandler:^(double trafficTime) {
-            completionBlock(@"success");
-            if (trafficTime) {
+            if (trafficTime != -1) {
                 NSString *timeString = [timeFormatter stringFromDate:[NSDate date]];
                 NSString *weekString = [[weekFormatter stringFromDate:[NSDate date]] capitalizedString];
                 NSDictionary *dict = @{@"trafficTime":@(trafficTime), @"time":timeString, @"weekday":weekString};
                 [timeDic addObject:dict];
                 [timeDic writeToFile:routePath atomically:NO];
             }
+            completionBlock(@"success");
         }];
 }
 

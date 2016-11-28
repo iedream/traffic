@@ -354,7 +354,7 @@ NSMutableDictionary *labelDic;
                 
                 NSArray *allPoints = [[[routeInfo objectForKey:@"routePath"] objectForKey:@"line"] objectForKey:@"coordinates"];
                 NSUInteger length = allPoints.count;
-                MKMapPoint pathRouteArray[32];
+                MKMapPoint pathRouteArray[10000];
                 for (int i = 0; i < length; i++) {
                     NSArray *currentPoint = allPoints[i];
                     CLLocationCoordinate2D currentCoord = CLLocationCoordinate2DMake([currentPoint[0] floatValue], [currentPoint[1] floatValue]);
@@ -362,6 +362,8 @@ NSMutableDictionary *labelDic;
                     pathRouteArray[i] = mapPoint;
                 }
                 BingPolyLine *polyLine = [BingPolyLine polylineWithPoints:pathRouteArray count:length];
+                polyLine.source = startPlaceMark.coordinate;
+                polyLine.dest = endPlaceMark.coordinate;
                 
                 NSMutableArray *directionDataSource = [[NSMutableArray alloc]init];
                 NSArray *routeLegs = [routeInfo objectForKey:@"routeLegs"];
